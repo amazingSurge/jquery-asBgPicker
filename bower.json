@@ -1,0 +1,22 @@
+{
+  "name": "jquery-asBgPicker",
+  "version": "0.1.0",
+  "homepage": "https://github.com/amazingSurge/jquery-asBgPicker",
+  "author": {
+    "name": "amazingSurge",
+    "email": "amazingSurge@yahoo.com",
+    "url": "amazingSurge.com"
+  },
+  "license": "GPL",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery-dropdown": "https://github.com/amazingSurge/jquery-dropdown.git",
+    "jquery": ">=1.8.3"
+  }
+}

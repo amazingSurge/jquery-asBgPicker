@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>jquery-background-location</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+
+        <link rel="stylesheet" href="css/dropdown.css">
+        <link rel="stylesheet" href="css/asBgPicker.css">
+
+        <script src="js/vendor/jquery-1.9.1.min.js"></script>
+        <script type="text/javascript" src="js/jquery-dropdown.js"></script>
+        <script src="../src/jquery-asBgPicker.js"></script>
+        <style type="text/css">
+            input {
+                width: 100%;
+            }
+        </style>
+    </head>
+<body>
+<!--[if lt IE 7]>
+    <p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
+<![endif]-->
+
+    <form action=""> 
+        <input type="text" class="bg-location" value='{"repeat":"no-repeat","position":"center center","attachment":"inherit","image": "images\/x_x2.png"}' />
+    </form>
+    <!-- "images\/x_x2.png","image":"images\/nvnv.png","thumbnails":"images\/thumbnails-minv.png" -->
+    
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('.bg-location').asBgPicker({
+                onClickImage: function() {
+                    this.setImage('images\/nvnv.png');
+                    this.setRepeat("repeat-y");
+                    this.setSize("60% 60%");
+                    this.setPosition("center left");
+                    this.setAttachment("scroll");
+                }
+            });
+        });
+    </script>
+</body>
+</html>

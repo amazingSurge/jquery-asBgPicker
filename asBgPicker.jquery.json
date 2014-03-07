@@ -1,0 +1,27 @@
+{
+  "name": "backgroundLocate",
+  "title": " jQuery Backgroundlocate",
+  "description": "a jQuery plugin.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/amazingSurge/jquery-backgroundLocate",
+  "author": {
+    "name": "amazingSurge",
+    "email": "amazingSurge@yahoo.com",
+    "url": "amazingSurge.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/amazingSurge/jquery-backgroundLocate.git"
+  },
+  "bugs": "https://github.com/amazingSurge/jquery-backgroundLocate/issues",
+  "licenses": [
+    {
+      "type": "GPL",
+      "url": "https://github.com/amazingSurge/jquery-backgroundLocate/blob/master/LICENSE-GPL"
+    }
+  ],
+  "dependencies": {
+    "jquery": "*"
+  },
+  "keywords": []
+}

@@ -1,0 +1,36 @@
+{
+  "name": "jquery-asBgPicker",
+  "title": "jQuery asBgPicker",
+  "description": "a jquery plugin",
+  "version": "0.1.0",
+  "homepage": "https://github.com/amazingSurge/jquery-asBgPicker",
+  "author": {
+    "name": "amazingSurge",
+    "email": "amazingSurge@yahoo.com",
+    "url": "amazingSurge.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/amazingSurge/jquery-asBgPicker.git"
+  },
+  "bugs": "https://github.com/amazingSurge/jquery-asBgPicker/issues",
+  "licenses": [
+    {
+      "type": "GPL",
+      "url": "https://github.com/amazingSurge/jquery-asBgPicker/blob/master/LICENSE-GPL"
+    }
+  ],
+  "devDependencies": {
+    "grunt-contrib-jshint": "~0.6.0",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-uglify": "~0.2.0",
+    "grunt-contrib-copy": "~0.4.1",
+    "grunt-contrib-watch": "~0.4.0",
+    "grunt-contrib-clean": "~0.4.0",
+    "grunt-jsbeautifier": "~0.1.10",
+    "grunt-text-replace": "~0.3.6",
+    "grunt": "~0.4.1",
+    "grunt-recess": "~0.3.1"
+  },
+  "keywords": []
+}

@@ -1,0 +1,97 @@
+@namespace: az;
+@az-reactive-color: #5cafda;
+@dropdown-trigger-color: #bbb;
+@dropdown-trigger-borderColor: #e4e4e4;
+@dropdown-trigger-bgColor: #fff;
+@dropdown-trigger_hover-borderColor: #bbb;
+
+@dropdown-panel-borderColor: @dropdown-trigger-borderColor;
+@dropdown-panel-bgColor: @dropdown-trigger-bgColor;
+@dropdown-panel-li-color: #777;
+@dropdown-panel-li-bgColor: @dropdown-trigger-bgColor;
+@dropdown-panel-li_hover-color: #fff;
+@dropdown-panel-li_hover-bgColor: #41a9e5;
+
+// ==============================================
+// dropdown
+// ==============================================
+
+.@{namespace}-dropdown-wrapper {
+    position: relative;
+    width: 194px;
+}
+
+.@{namespace}-dropdown-trigger {
+    position: relative;
+    height: 28px;
+    padding: 0 10px;
+    color: @dropdown-trigger-color;
+    font-size: 12px;
+    line-height: 28px;
+    border: 2px solid @dropdown-trigger-borderColor;
+    background-color: @dropdown-trigger-bgColor;
+    &:after,&:before {
+        content: "";
+        display: table;
+    }
+    &:after {
+        clear: both;
+        overflow: hidden;
+    }
+    &:hover {
+        border-color: @dropdown-trigger_hover-borderColor;
+    }
+    i {
+        position: absolute;
+        top: 0;
+        right: 10px;
+        &:before {
+            // .inline-block();
+            display: inline-block;
+            content: url("../images/icon-trangle.png");
+            width: 1em;
+            line-height: 1em;
+            speak: none;
+            text-decoration: none;
+        }
+    }
+}
+.@{namespace}-dropdown-panel {
+display: none;
+position: absolute;
+z-index: 3;
+    width: inherit;
+    margin: 5px 0;
+    padding: 3px 2px;
+    border: 2px solid @dropdown-panel-borderColor;
+    background-color: @dropdown-panel-bgColor;
+    // .box-sizing(border-box);
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    li {
+        display: block;
+        margin: 0;
+        padding: 6px 10px;
+        color: @dropdown-panel-li-color;
+        font-size: 12px;
+        list-style: none;
+        background-color: @dropdown-panel-li-bgColor;
+        &:hover {
+            color: @dropdown-panel-li_hover-color;
+            background-color: @dropdown-panel-li_hover-bgColor;
+        }
+    }
+}
+.@{namespace}-dropdown-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+.@{namespace}-dropdown-panel.@{namespace}-dropdown_show {
+display: block;
+}
+//==============================================
