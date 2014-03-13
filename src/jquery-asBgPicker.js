@@ -43,7 +43,7 @@
         this.initialed = false;
 
         var self = this;
-        $.extend(self,{
+        $.extend(self, {
             init: function() {
                 // console.log(this,"thisxxxx",self);
                 self._createHtml();
@@ -71,7 +71,7 @@
                 self._bindEvent();
 
                 // init
-                self._process();
+                self.val(self.value, true);
 
                 self.initialed = true;
                 // after init end trigger 'ready'
@@ -115,14 +115,7 @@
                         return;
                     }
 
-                    self.image = "";
-                    self.repeat = "";
-                    self.position = "";
-                    self.attachment = "";
-                    self.size = "";
-                    self._setState(self.image);
-                    self._returnInfo(self.image);
-                    self._process();
+                    self.clear();
 
                     return false;
                 });
@@ -192,7 +185,7 @@
                 self.attachmentValue = self.options.attachment.values;
 
                 if (value) {
-                    self.value = self._parseValue(value);
+                    self.value = self.options.parse(value);
                     self.image = self.value.image;
                 } else {
                     return false;
@@ -202,10 +195,6 @@
                     self.image = self.options.image;
                 }
             },
-            _parseValue: function(value) {
-                return jQuery.parseJSON(value);
-            },
-
             _setState: function(image) {
                 if (!image || image === self.options.image) {
                     self.$bg_trigger.removeClass(self.classes.hasImage);
@@ -223,14 +212,16 @@
                 }
             },
             _process: function() {
-                self.value_current = {};
-                self.value_current.repeat = self.repeat;
-                self.value_current.position = self.position;
-                self.value_current.attachment = self.attachment;
-                self.value_current.image = self.image;
-                self.value_current.size = self.size;
+                if (self.value === null) {
+                    self.value = {};
+                }
+                self.value.repeat = self.repeat;
+                self.value.position = self.position;
+                self.value.attachment = self.attachment;
+                self.value.image = self.image;
+                self.value.size = self.size;
 
-                self.$element.val(JSON.stringify(self.value_current));
+                self.$element.val(self.options.process(self.value));
 
                 self.$image.css({
                     "background-image": 'url("' + self.image + '")',
@@ -239,7 +230,7 @@
                     "background-position": self.position,
                     "background-size": self.size
                 });
-            },        
+            },
 
             doRepeat: {
                 init: function() {
@@ -256,14 +247,15 @@
                     self.$repeat = self.$extend.find('.' + self.namespace + '-repeat');
                     self.$repeatItem = self.$repeat.find('li');
                     self.doRepeat.setup(self.repeat);
-                    
+
                 },
 
                 setup: function(newValue) {
+                    self.$repeatItem.removeClass(self.classes.active);
                     $.each(self.repeatValue, function(key, value) {
                         self.$repeatItem.eq(key).data('repeat', value);
                         if (!newValue) {
-                            self.$repeatItem.removeClass(self.classes.active);
+                            return false;
                         } else if (newValue === value) {
                             self.$repeatItem.eq(key).addClass(self.classes.active);
                         }
@@ -290,7 +282,7 @@
                         }
                         self._process();
                     });
-                },
+                }
             },
 
             doPosition: {
@@ -307,12 +299,16 @@
 
                     self.$position = self.$extend.find('.' + self.namespace + '-position');
                     self.$positionItem = self.$position.find('li');
+                    self.doPosition.setup(self.position);
+                },
 
+                setup: function(newValue) {
+                    self.$positionItem.removeClass(self.classes.active);
                     $.each(self.positionValue, function(key, value) {
                         self.$positionItem.eq(key).data('position', value);
-                        if (!self.position) {
-                            self.$positionItem.removeClass(self.classes.active);
-                        } else if (self.position === value) {
+                        if (!newValue) {
+                            return false;
+                        } else if (newValue === value) {
                             self.$positionItem.eq(key).addClass(self.classes.active);
                         }
                     });
@@ -340,7 +336,7 @@
                     });
                 }
             },
-            
+
             doSize: {
                 init: function() {
                     if (!self.value) {
@@ -355,12 +351,16 @@
 
                     self.$size = self.$extend.find('.' + self.namespace + '-size');
                     self.$sizeItem = self.$size.find('li');
+                    self.doSize.setup(self.size);
+                },
 
+                setup: function(newValue) {
+                    self.$sizeItem.removeClass(self.classes.active);
                     $.each(self.sizeValue, function(key, value) {
                         self.$sizeItem.eq(key).data('size', value);
-                        if (!self.size) {
-                            self.$sizeItem.removeClass(self.classes.active);
-                        } else if (self.size === value) {
+                        if (!newValue) {
+                            return false;
+                        } else if (newValue === value) {
                             self.$sizeItem.eq(key).addClass(self.classes.active);
                         }
                     });
@@ -388,7 +388,7 @@
                     });
                 }
             },
-            
+
             doAttachment: {
                 init: function() {
                     if (!self.value) {
@@ -397,16 +397,20 @@
                         self.attachment = self.value.attachment;
                     }
 
-                    var tpl_content = self.options.attachment.tpl().replace(/otherNamespace/g, self.options.namespace).replace(/namespace/g, self.namespace);
+                    var tpl_content = self.options.attachment.tpl().replace(/otherNamespace/g, self.options.attachment.namespace).replace(/namespace/g, self.namespace);
                     self.$tpl_attachment = $(tpl_content);
                     self.$image_wrap.after(self.$tpl_attachment);
 
                     self.$attachment = self.$extend.find('.' + self.namespace + '-attachment');
                     self.$attachmentItem = self.$attachment.find('li');
-                    self.$dropdown = self.$extend.find('.' + self.options.namespace);
+                    self.$dropdown = self.$extend.find('.' + self.options.attachment.namespace);
+                    self.doAttachment.setup(self.attachment);
+                },
 
+                setup: function(newValue) {
+                    self.select = 2;
                     for (var i = 0; i < self.attachmentValue.length; i++) {
-                        if (self.attachmentValue[i] === self.attachment) {
+                        if (self.attachmentValue[i] === newValue) {
                             self.select = i;
                         }
                     }
@@ -455,44 +459,46 @@
 
         set: function(value, update) {
             var self = this;
-            self.value = value;
-            
-            // self._initSize([value.size]);
-            // self._initAttachment([value.attachment]);
-            // self._initPosition([value.position]);
-            // self._initRepeat([value.repeat]);
 
             if (update !== false) {
-                self.options.onChange.call(self, value);
-                self.$element.val(JSON.stringify(value));
+                self.value = value;
+                self.image = value.image;
+                self.repeat = value.repeat;
+                self.size = value.size;
+                self.position = value.position;
+                self.attachment = value.attachment;
 
-            // this.$image.css({
-            //     "background-image": 'url("' + value.image + '")',
-            //     "background-repeat": value.repeat,
-            //     "background-attachment": value.attachment,
-            //     "background-position": value.position,
-            //     "background-size": value.size
-            // });
+                self.doRepeat.setup(value.repeat);
+                self.doSize.setup(value.size);
+                self.doPosition.setup(value.position);
+                self.doAttachment.setup(value.attachment);
+
+                self._process();
+
+                self.options.onChange.call(self, value);
             }
-            
         },
 
         clear: function(update) {
-            this.value = null;
-            self.image = "";
-            self.repeat = "";
-            self.position = "";
-            self.attachment = "";
-            self.size = "";
-            // self._setState(self.image);
-            // self._returnInfo(self.image);
-            self._process();
+            var self = this;
+            self.value = null;
 
             // this._setState('empty');
-
             if (update !== false) {
-                this.options.onChange.call(this, this.value);
-                // this.$element.val(this.value);
+                self.image = "";
+                self.repeat = "";
+                self.position = "";
+                self.attachment = "";
+                self.size = "";
+                self._setState(self.image);
+                self._returnInfo(self.image);
+                self.doRepeat.setup(self.repeat);
+                self.doSize.setup(self.size);
+                self.doPosition.setup(self.position);
+                self.doAttachment.setup(self.attachment);
+                self._process();
+                self.options.onChange.call(self, self.value);
+
             }
         },
 
@@ -525,14 +531,17 @@
         },
         setSize: function(size) {
             this.size = size;
+            this.doSize.setup(size);
             this._process();
         },
         setPosition: function(position) {
             this.position = position;
+            this.doPosition.setup(position);
             this._process();
         },
         setAttachment: function(attachment) {
             this.attachment = attachment;
+            this.doAttachment.setup(attachment);
             this._process();
         },
 
@@ -560,15 +569,15 @@
             values: ["no-repeat", "repeat", "repeat-x", "repeat-y"],
             //this.options.tpl().replace(/namespace/g, this.namespace);
             tpl: function() {
-                return  '<div class="namespace-repeat">' +
-                            '<span class="namespace-repeat-title">Repeat</span>' +
-                            '<ul class="namespace-repeat-content">' +
-                                '<li class="repeat_no-repeat"></li>' +
-                                '<li class="repeat_repeat"></li>' +
-                                '<li class="repeat_repeat-x"></li>' +
-                                '<li class="repeat_repeat-y"></li>' +
-                            '</ul>' +
-                        '</div>';
+                return '<div class="namespace-repeat">' +
+                    '<span class="namespace-repeat-title">Repeat</span>' +
+                    '<ul class="namespace-repeat-content">' +
+                    '<li class="repeat_no-repeat"></li>' +
+                    '<li class="repeat_repeat"></li>' +
+                    '<li class="repeat_repeat-x"></li>' +
+                    '<li class="repeat_repeat-y"></li>' +
+                    '</ul>' +
+                    '</div>';
             }
         },
         position: {
@@ -576,19 +585,19 @@
             values: ["top left", "top center", "top right", "center left", "center center", "center right", "bottom left", "bottom center", "bottom right"],
             tpl: function() {
                 return '<div class="namespace-position">' +
-                            '<span class="namespace-position-title">Position</span>' +
-                            '<ul class="namespace-position-content">' +
-                                '<li class="postion_top-left"></li>' +
-                                '<li class="postion_top-center"></li>' +
-                                '<li class="postion_top-right"></li>' +
-                                '<li class="postion_center-left"></li>' +
-                                '<li class="postion_center-center"></li>' +
-                                '<li class="postion_center-right"></li>' +
-                                '<li class="postion_bottom-left"></li>' +
-                                '<li class="postion_bottom-center"></li>' +
-                                '<li class="postion_bottom-right"></li>' +
-                            '</ul>' +
-                        '</div>';
+                    '<span class="namespace-position-title">Position</span>' +
+                    '<ul class="namespace-position-content">' +
+                    '<li class="postion_top-left"></li>' +
+                    '<li class="postion_top-center"></li>' +
+                    '<li class="postion_top-right"></li>' +
+                    '<li class="postion_center-left"></li>' +
+                    '<li class="postion_center-center"></li>' +
+                    '<li class="postion_center-right"></li>' +
+                    '<li class="postion_bottom-left"></li>' +
+                    '<li class="postion_bottom-center"></li>' +
+                    '<li class="postion_bottom-right"></li>' +
+                    '</ul>' +
+                    '</div>';
             }
         },
         size: {
@@ -596,14 +605,14 @@
             values: ["auto", "cover", "contain", "100% 100%"],
             tpl: function() {
                 return '<div class="namespace-size">' +
-                            '<span class="namespace-size-title">Scalling</span>' +
-                            '<ul class="namespace-size-content">' +
-                                '<li class="size_adapt-height"></li>' +
-                                '<li class="size_adapt-width"></li>' +
-                                '<li class="size_adapt-all"></li>' +
-                                '<li class="size_adapt-auto"></li>' +
-                            '</ul>' +
-                        '</div>';
+                    '<span class="namespace-size-title">Scalling</span>' +
+                    '<ul class="namespace-size-content">' +
+                    '<li class="size_adapt-height"></li>' +
+                    '<li class="size_adapt-width"></li>' +
+                    '<li class="size_adapt-all"></li>' +
+                    '<li class="size_adapt-auto"></li>' +
+                    '</ul>' +
+                    '</div>';
             }
         },
         attachment: {
@@ -612,37 +621,37 @@
             values: ["scroll", "fixed", "inherit"],
             tpl: function() {
                 return '<div class="namespace-attachment">' +
-                            '<span class="namespace-attachment-title">Attach</span>' +
-                            '<div class="namespace-attachment-content">' +
-                                '<div class="otherNamespace namespace-dropdown-trigger"><span></span></div>' +
-                                '<ul>' +
-                                    '<li class="attachment_scroll" value="scroll">scroll</li>' +
-                                    '<li class="attachment_fixed" value="fixed">fixed</li>' +
-                                    '<li class="attachment_default" value="inherit">default</li>' +
-                                '</ul>' +
-                            '</div>' +
-                        '</div>';
+                    '<span class="namespace-attachment-title">Attach</span>' +
+                    '<div class="namespace-attachment-content">' +
+                    '<div class="otherNamespace namespace-dropdown-trigger"><span></span></div>' +
+                    '<ul>' +
+                    '<li class="attachment_scroll" value="scroll">scroll</li>' +
+                    '<li class="attachment_fixed" value="fixed">fixed</li>' +
+                    '<li class="attachment_default" value="inherit">default</li>' +
+                    '</ul>' +
+                    '</div>' +
+                    '</div>';
             }
         },
         // position: null,
 
         tpl: function() {
             return '<div class="' + this.namespace + '">' +
-                        '<div class="' + this.namespace + '-trigger">' +
-                            '<div class="' + this.namespace + '-image-info"><span></span>Add Image</div>' +
-                            '<div class="' + this.namespace + '-mask">Change</div>' +
-                            '<a class="' + this.namespace + '-remove" href=""></a>' +
-                        '</div>' +
-                    '</div>';
+                '<div class="' + this.namespace + '-trigger">' +
+                '<div class="' + this.namespace + '-image-info"><span></span>Add Image</div>' +
+                '<div class="' + this.namespace + '-mask">Change</div>' +
+                '<a class="' + this.namespace + '-remove" href=""></a>' +
+                '</div>' +
+                '</div>';
         },
 
         tpl_extend: function() {
             return '<div class="' + this.namespace + '-extend">' +
-                        '<a class="' + this.namespace + '-close" href="#"></a>' +
-                        '<div class="' + this.namespace + '-image-wrap">' +
-                            '<div class="' + this.namespace + '-image"></div>' +
-                        '</div>' +
-                    '</div>';
+                '<a class="' + this.namespace + '-close" href="#"></a>' +
+                '<div class="' + this.namespace + '-image-wrap">' +
+                '<div class="' + this.namespace + '-image"></div>' +
+                '</div>' +
+                '</div>';
         },
 
         process: function(value) {
