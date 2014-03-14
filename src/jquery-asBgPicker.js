@@ -45,7 +45,6 @@
         var self = this;
         $.extend(self, {
             init: function() {
-                // console.log(this,"thisxxxx",self);
                 self._createHtml();
 
                 if (self.options.skin) {
@@ -108,7 +107,7 @@
                 self.doRepeat.bindEvent();
                 self.doPosition.bindEvent();
                 self.doSize.bindEvent();
-                self.doAttachment.bindEvent();
+                // self.doAttachment.bindEvent();
 
                 self.$bg_remove.on("click", function() {
                     if (self.disabled) {
@@ -247,16 +246,13 @@
                     self.$repeat = self.$extend.find('.' + self.namespace + '-repeat');
                     self.$repeatItem = self.$repeat.find('li');
                     self.doRepeat.setup(self.repeat);
-
                 },
 
                 setup: function(newValue) {
                     self.$repeatItem.removeClass(self.classes.active);
                     $.each(self.repeatValue, function(key, value) {
                         self.$repeatItem.eq(key).data('repeat', value);
-                        if (!newValue) {
-                            return false;
-                        } else if (newValue === value) {
+                        if (newValue === value) {
                             self.$repeatItem.eq(key).addClass(self.classes.active);
                         }
                     });
@@ -281,6 +277,7 @@
                             $(this).addClass(self.classes.active);
                         }
                         self._process();
+                        return false;
                     });
                 }
             },
@@ -306,9 +303,7 @@
                     self.$positionItem.removeClass(self.classes.active);
                     $.each(self.positionValue, function(key, value) {
                         self.$positionItem.eq(key).data('position', value);
-                        if (!newValue) {
-                            return false;
-                        } else if (newValue === value) {
+                        if (newValue === value) {
                             self.$positionItem.eq(key).addClass(self.classes.active);
                         }
                     });
@@ -333,6 +328,7 @@
                             $(this).addClass(self.classes.active);
                         }
                         self._process();
+                        return false;
                     });
                 }
             },
@@ -358,9 +354,7 @@
                     self.$sizeItem.removeClass(self.classes.active);
                     $.each(self.sizeValue, function(key, value) {
                         self.$sizeItem.eq(key).data('size', value);
-                        if (!newValue) {
-                            return false;
-                        } else if (newValue === value) {
+                        if (newValue === value) {
                             self.$sizeItem.eq(key).addClass(self.classes.active);
                         }
                     });
@@ -385,6 +379,7 @@
                             $(this).addClass(self.classes.active);
                         }
                         self._process();
+                        return false;
                     });
                 }
             },
@@ -404,19 +399,7 @@
                     self.$attachment = self.$extend.find('.' + self.namespace + '-attachment');
                     self.$attachmentItem = self.$attachment.find('li');
                     self.$dropdown = self.$extend.find('.' + self.options.attachment.namespace);
-                    self.doAttachment.setup(self.attachment);
-                },
-
-                setup: function(newValue) {
-                    self.select = 2;
-                    for (var i = 0; i < self.attachmentValue.length; i++) {
-                        if (self.attachmentValue[i] === newValue) {
-                            self.select = i;
-                        }
-                    }
-                },
-
-                bindEvent: function() {
+                    self.select = self.doAttachment.setup(self.attachment);
                     self.$dropdown.dropdown({
                         namespace: self.options.attachment.namespace,
                         imitateSelect: true,
@@ -430,7 +413,22 @@
                             self._process();
                         }
                     });
+                },
+
+                setup: function(newValue) {
+                    for (var i = 0; i < self.attachmentValue.length; i++) {
+                        if (self.attachmentValue[i] === newValue) {
+                            return i;
+                        }
+                    }                                        
+                },
+
+                setItem: function(i) {
+                    self.$dropdown.data('dropdown').set(self.$attachmentItem.eq(i));
                 }
+
+                // bindEvent: function() {
+                // }
             }
         });
 
@@ -490,15 +488,16 @@
                 self.position = "";
                 self.attachment = "";
                 self.size = "";
+
                 self._setState(self.image);
                 self._returnInfo(self.image);
+
                 self.doRepeat.setup(self.repeat);
                 self.doSize.setup(self.size);
                 self.doPosition.setup(self.position);
                 self.doAttachment.setup(self.attachment);
                 self._process();
                 self.options.onChange.call(self, self.value);
-
             }
         },
 
@@ -541,7 +540,8 @@
         },
         setAttachment: function(attachment) {
             this.attachment = attachment;
-            this.doAttachment.setup(attachment);
+            this.select = this.doAttachment.setup(attachment);
+            this.doAttachment.setItem(this.select);
             this._process();
         },
 
