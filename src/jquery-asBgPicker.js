@@ -7,7 +7,7 @@
  */
 
 
-(function($, document, window, undefined) {
+(function ($, document, window, undefined) {
 
     "use strict";
 
@@ -106,7 +106,6 @@
 
                     return false;
                 });
-
 
                 self.$close.on("click", function() {
                     if (self.disabled) {
@@ -572,10 +571,10 @@
                 return '<div class="namespace-size">' +
                     '<span class="namespace-size-title">Scalling</span>' +
                     '<ul class="namespace-size-content">' +
-                    '<li class="size_adapt-height"></li>' +
-                    '<li class="size_adapt-width"></li>' +
-                    '<li class="size_adapt-all"></li>' +
                     '<li class="size_adapt-auto"></li>' +
+                    '<li class="size_adapt-width"></li>' +
+                    '<li class="size_adapt-height"></li>' +
+                    '<li class="size_adapt-all"></li>' +
                     '</ul>' +
                     '</div>';
             }
