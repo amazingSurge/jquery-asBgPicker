@@ -36,11 +36,18 @@
         $(document).ready(function() {
             $('.bg-location').asBgPicker({
                 onClickImage: function() {
-                    this.setImage('images\/nvnv.png');
-                    this.setRepeat("repeat-y");
-                    this.setSize("100% 100%");
-                    this.setPosition("center left");
-                    this.setAttachment("scroll");
+                    // this.setImage('images\/nvnv.png');
+                    // this.setRepeat("repeat-y");
+                    // this.setSize("100% 100%");
+                    // this.setPosition("center left");
+                    // this.setAttachment("scroll");
+                    var value = {};
+                    value.image = 'images/nvnv.png';
+                    value.repeat = 'repeat-y';
+                    value.size = '100% 100%';
+                    value.position = 'center right';
+                    value.attachment = 'fixed';
+                    this.set(value);
                 }
             });
         });
