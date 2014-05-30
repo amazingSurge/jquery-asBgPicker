@@ -14,11 +14,11 @@ module.exports = function(grunt) {
         },
         // -- copy config ----------------------------------------------------------
         copy: {
-            jquery_dropdown: {
+            jquery_asDropdown: {
                 files: [{
                     expand: true,
                     flatten: true,
-                    cwd: 'bower_components/jquery-dropdown/',
+                    cwd: 'bower_components/jquery-asDropdown/',
                     src: ['dist/*.js'],
                     dest: 'demo/js/'
                 }]
@@ -117,8 +117,7 @@ module.exports = function(grunt) {
                     compile: true
                 },
                 files: {
-                    'demo/css/asBgPicker.css': ['less/asBgPicker.less'],
-                    'demo/css/dropdown.css': ['less/dropdown.less']
+                    'demo/css/asBgPicker.css': ['less/asBgPicker.less']
                 }
             }
         },
@@ -128,16 +127,9 @@ module.exports = function(grunt) {
 
     // -- Main Tasks ---------------------------------------------------------------
     // These plugins provide necessary tasks.
-    grunt.loadNpmTasks('grunt-contrib-clean');
-    grunt.loadNpmTasks('grunt-contrib-concat');
-    grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.loadNpmTasks('grunt-contrib-jshint');
-    grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-contrib-copy');
-
-    grunt.loadNpmTasks('grunt-jsbeautifier');
-    grunt.loadNpmTasks('grunt-recess');
-    grunt.loadNpmTasks('grunt-text-replace');
+    require('load-grunt-tasks')(grunt, {
+        pattern: ['grunt-*']
+    });
 
     // Default task.
     grunt.registerTask('default', ['jshint', 'jsbeautifier', 'clean', 'copy', 'concat', 'uglify', 'recess']);

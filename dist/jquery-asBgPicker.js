@@ -1,4 +1,4 @@
-/*! jQuery asBgPicker - v0.1.0 - 2014-03-13
+/*! jQuery asBgPicker - v0.1.0 - 2014-05-30
 * https://github.com/amazingSurge/jquery-asBgPicker
 * Copyright (c) 2014 amazingSurge; Licensed GPL */
 (function($, document, window, undefined) {
@@ -14,12 +14,17 @@
         this.element = element;
         this.$element = $(element);
 
+        if (this.$element.attr('name')) {
+            this.name = this.$element.attr('name');
+        } else {
+            this.name = options.name;
+        }
+
         this.options = $.extend({}, Plugin.defaults, options, this.$element.data(), metas);
         this.namespace = this.options.namespace;
         this.components = $.extend(true, {}, this.components);
 
         // public properties
-
         this.classes = {
             // status
             skin: this.namespace + '_' + this.options.skin,
@@ -39,7 +44,6 @@
         var self = this;
         $.extend(self, {
             init: function() {
-                // console.log(this,"thisxxxx",self);
                 self._createHtml();
 
                 if (self.options.skin) {
@@ -51,11 +55,8 @@
                 if (self.options.disabled) {
                     self.disable();
                 }
-
-                // //image
-                self._setState(self.image);
-                self._returnInfo(self.image);
-                self.setImage(self.image);
+                // init
+                self.setImage(self.value.image);
 
                 self.doSize.init();
                 self.doAttachment.init();
@@ -64,47 +65,39 @@
 
                 self._bindEvent();
 
-                // init
-                self.val(self.value, true);
-
                 self.initialed = true;
                 // after init end trigger 'ready'
                 self._trigger('ready');
             },
 
             _bindEvent: function() {
-                self.$bg_trigger.on('mouseenter', function() {
+                self.$initiate.on('mouseenter', function() {
                     if (self.disabled) {
                         return;
                     }
 
-                    self.$bg_mask.addClass(self.classes.show);
-                    self.$bg_remove.addClass(self.classes.show);
+                    self.$actions.addClass(self.classes.show);
+                    self.$remove.addClass(self.classes.show);
                 }).on('mouseleave', function() {
                     if (self.disabled) {
                         return;
                     }
 
-                    self.$bg_mask.removeClass(self.classes.show);
-                    self.$bg_remove.removeClass(self.classes.show);
+                    self.$actions.removeClass(self.classes.show);
+                    self.$remove.removeClass(self.classes.show);
                 });
 
-                self.$bg_mask.on("click", function() {
+                self.$actions.on("click", function() {
                     if (self.disabled) {
                         return;
                     }
 
-                    self.$bg_trigger.addClass(self.classes.hide);
+                    self.$initiate.addClass(self.classes.hide);
                     self.$wrap.append(self.$extend);
                     self.$extend.removeClass(self.classes.hide).addClass(self.classes.show);
                 });
 
-                self.doRepeat.bindEvent();
-                self.doPosition.bindEvent();
-                self.doSize.bindEvent();
-                self.doAttachment.bindEvent();
-
-                self.$bg_remove.on("click", function() {
+                self.$remove.on("click", function() {
                     if (self.disabled) {
                         return;
                     }
@@ -114,14 +107,13 @@
                     return false;
                 });
 
-
-                self.$bg_close.on("click", function() {
+                self.$close.on("click", function() {
                     if (self.disabled) {
                         return;
                     }
 
                     self.$extend.removeClass(self.classes.show).addClass(self.classes.hide);
-                    self.$bg_trigger.removeClass(self.classes.hide);
+                    self.$initiate.removeClass(self.classes.hide);
 
                     return false;
                 });
@@ -147,11 +139,11 @@
                 self.$extend = $(self.options.tpl_extend());
                 self.$element.after(self.$wrap);
 
-                self.$bg_trigger = self.$wrap.find('.' + self.namespace + '-trigger');
-                self.$bg_image = self.$bg_trigger.find('.' + self.namespace + '-image-info');
-                self.$bg_remove = self.$wrap.find('.' + self.namespace + '-remove');
-                self.$bg_mask = self.$wrap.find('.' + self.namespace + '-mask');
-                self.$bg_close = self.$extend.find('.' + self.namespace + '-close');
+                self.$initiate = self.$wrap.find('.' + self.namespace + '-initiate');
+                self.$info = self.$initiate.find('.' + self.namespace + '-image-info');
+                self.$remove = self.$wrap.find('.' + self.namespace + '-remove');
+                self.$actions = self.$wrap.find('.' + self.namespace + '-actions');
+                self.$close = self.$extend.find('.' + self.namespace + '-close');
 
                 self.$image = self.$extend.find('.' + self.namespace + '-image');
                 self.$image_wrap = self.$extend.find('.' + self.namespace + '-image-wrap');
@@ -159,7 +151,8 @@
 
             _trigger: function(eventType) {
                 // event
-                self.$element.trigger(pluginName + '::' + eventType, self);
+                self.$element.trigger('asBgPicker::' + eventType, self);
+                self.$element.trigger(eventType + '.asBgPicker', self);
 
                 // callback
                 eventType = eventType.replace(/\b\w+\b/g, function(word) {
@@ -173,272 +166,252 @@
             },
             _getValue: function() {
                 var value = self.$element.val();
-                self.repeatValue = self.options.repeat.values;
-                self.positionValue = self.options.position.values;
-                self.sizeValue = self.options.size.values;
-                self.attachmentValue = self.options.attachment.values;
 
                 if (value) {
                     self.value = self.options.parse(value);
-                    self.image = self.value.image;
                 } else {
                     return false;
-                }
-
-                if (!self.image) {
-                    self.image = self.options.image;
                 }
             },
             _setState: function(image) {
                 if (!image || image === self.options.image) {
-                    self.$bg_trigger.removeClass(self.classes.hasImage);
+                    self.$initiate.removeClass(self.classes.hasImage);
                 } else {
-                    self.$bg_trigger.addClass(self.classes.hasImage);
+                    self.$initiate.addClass(self.classes.hasImage);
                 }
             },
             _returnInfo: function(image) {
                 var img_name;
                 if (!image || image === self.options.image) {
-                    $(self.$bg_image)[0].lastChild.nodeValue = "Add Image";
+                    $(self.$info)[0].lastChild.nodeValue = "Add Image";
                 } else {
                     img_name = image.match(/([\S]+[\/])([\S]+\w+$)/i)[2];
-                    $(self.$bg_image)[0].lastChild.nodeValue = img_name;
+                    $(self.$info)[0].lastChild.nodeValue = img_name;
                 }
             },
             _process: function() {
                 if (self.value === null) {
                     self.value = {};
                 }
-                self.value.repeat = self.repeat;
-                self.value.position = self.position;
-                self.value.attachment = self.attachment;
-                self.value.image = self.image;
-                self.value.size = self.size;
-
+                if (typeof self.value.image === "undefined") {
+                    self.value.image = "";
+                }
+                self.options.onChange.call(self, self.value);
                 self.$element.val(self.options.process(self.value));
-
-                self.$image.css({
-                    "background-image": 'url("' + self.image + '")',
-                    "background-repeat": self.repeat,
-                    "background-attachment": self.attachment,
-                    "background-position": self.position,
-                    "background-size": self.size
-                });
             },
 
             doRepeat: {
                 init: function() {
-                    if (!self.value) {
-                        self.repeat = self.options.repeat.default_value;
+                    var oneself = this;
+                    if (!self.value.repeat) {
+                        this.repeat = self.options.repeat.default_value;
                     } else {
-                        self.repeat = self.value.repeat;
+                        this.repeat = self.value.repeat;
                     }
 
                     var tpl_content = self.options.repeat.tpl().replace(/namespace/g, self.namespace);
-                    self.$tpl_repeat = $(tpl_content);
-                    self.$image_wrap.after(self.$tpl_repeat);
+                    this.$tpl_repeat = $(tpl_content);
+                    self.$image_wrap.after(this.$tpl_repeat);
 
-                    self.$repeat = self.$extend.find('.' + self.namespace + '-repeat');
-                    self.$repeatItem = self.$repeat.find('li');
-                    self.doRepeat.setup(self.repeat);
+                    this.$repeat = self.$extend.find('.' + self.namespace + '-repeat');
+                    this.$items = this.$repeat.find('li');
+                    this.repeatValues = self.options.repeat.values;
 
+                    $.each(this.repeatValues, function(key, value) {
+                        oneself.$items.eq(key).data('repeat', value);
+                    });
+
+                    this.set(this.repeat);
+                    this.bindEvent();
                 },
 
-                setup: function(newValue) {
-                    self.$repeatItem.removeClass(self.classes.active);
-                    $.each(self.repeatValue, function(key, value) {
-                        self.$repeatItem.eq(key).data('repeat', value);
-                        if (!newValue) {
-                            return false;
-                        } else if (newValue === value) {
-                            self.$repeatItem.eq(key).addClass(self.classes.active);
+                set: function(newValue) {
+                    this.$items.removeClass(self.classes.active);
+                    for (var i = 0; i < this.repeatValues.length; i++) {
+                        if (newValue === this.repeatValues[i]) {
+                            self.value.repeat = newValue;
+                            this.$items.eq(i).addClass(self.classes.active);
                         }
+                    };
+                    self.$image.css({
+                        "background-repeat": newValue
                     });
                 },
 
                 bindEvent: function() {
-                    self.$repeat.on("click", "li", function() {
+                    var oneself = this;
+                    this.$repeat.on("click", "li", function() {
                         if (self.disabled) {
                             return;
                         }
-
                         var bgRepeat = $(this).data("repeat");
-                        if (self.repeat === bgRepeat) {
-                            return false;
-                        } else {
-                            self.repeat = bgRepeat;
-                        }
-                        if ($(this).hasClass(self.classes.active)) {
-                            return false;
-                        } else {
-                            self.$repeatItem.removeClass(self.classes.active);
-                            $(this).addClass(self.classes.active);
-                        }
+                        oneself.set(bgRepeat);
                         self._process();
+                        return false;
                     });
                 }
             },
 
             doPosition: {
                 init: function() {
-                    if (!self.value) {
-                        self.position = self.options.position.default_value;
+                    var oneself = this;
+                    if (!self.value.position) {
+                        this.position = self.options.position.default_value;
                     } else {
-                        self.position = self.value.position;
+                        this.position = self.value.position;
                     }
 
                     var tpl_content = self.options.position.tpl().replace(/namespace/g, self.namespace);
-                    self.$tpl_position = $(tpl_content);
-                    self.$image_wrap.after(self.$tpl_position);
+                    this.$tpl_position = $(tpl_content);
+                    self.$image_wrap.after(this.$tpl_position);
 
-                    self.$position = self.$extend.find('.' + self.namespace + '-position');
-                    self.$positionItem = self.$position.find('li');
-                    self.doPosition.setup(self.position);
+                    this.$position = self.$extend.find('.' + self.namespace + '-position');
+                    this.$items = this.$position.find('li');
+                    this.positionValues = self.options.position.values;
+
+                    $.each(this.positionValues, function(key, value) {
+                        oneself.$items.eq(key).data('position', value);
+                    });
+
+                    this.set(this.position);
+                    this.bindEvent();
                 },
 
-                setup: function(newValue) {
-                    self.$positionItem.removeClass(self.classes.active);
-                    $.each(self.positionValue, function(key, value) {
-                        self.$positionItem.eq(key).data('position', value);
-                        if (!newValue) {
-                            return false;
-                        } else if (newValue === value) {
-                            self.$positionItem.eq(key).addClass(self.classes.active);
+                set: function(newValue) {
+                    this.$items.removeClass(self.classes.active);
+                    for (var i = 0; i < this.positionValues.length; i++) {
+                        if (newValue === this.positionValues[i]) {
+                            self.value.position = newValue;
+                            this.$items.eq(i).addClass(self.classes.active);
                         }
+                    };
+                    self.$image.css({
+                        "background-position": newValue
                     });
                 },
 
                 bindEvent: function() {
-                    self.$position.on("click", "li", function() {
+                    var oneself = this;
+                    this.$position.on("click", "li", function() {
                         if (self.disabled) {
                             return;
                         }
-
                         var bgPosition = $(this).data("position");
-                        if (self.position === bgPosition) {
-                            return false;
-                        } else {
-                            self.position = bgPosition;
-                        }
-                        if ($(this).hasClass(self.classes.active)) {
-                            return false;
-                        } else {
-                            self.$positionItem.removeClass(self.classes.active);
-                            $(this).addClass(self.classes.active);
-                        }
+                        oneself.set(bgPosition);
                         self._process();
+                        return false;
                     });
                 }
             },
 
             doSize: {
                 init: function() {
-                    if (!self.value) {
-                        self.size = self.options.size.default_value;
+                    var oneself = this;
+                    if (!self.value.size) {
+                        this.size = self.options.size.default_value;
                     } else {
-                        self.size = self.value.size;
+                        this.size = self.value.size;
                     }
 
                     var tpl_content = self.options.size.tpl().replace(/namespace/g, self.namespace);
-                    self.$tpl_size = $(tpl_content);
-                    self.$image_wrap.after(self.$tpl_size);
+                    this.$tpl_size = $(tpl_content);
+                    self.$image_wrap.after(this.$tpl_size);
 
-                    self.$size = self.$extend.find('.' + self.namespace + '-size');
-                    self.$sizeItem = self.$size.find('li');
-                    self.doSize.setup(self.size);
+                    this.$size = self.$extend.find('.' + self.namespace + '-size');
+                    this.$items = this.$size.find('li');
+                    this.sizeValues = self.options.size.values;
+
+                    $.each(this.sizeValues, function(key, value) {
+                        oneself.$items.eq(key).data('size', value);
+                    });
+
+                    this.set(this.size);
+                    this.bindEvent();
                 },
 
-                setup: function(newValue) {
-                    self.$sizeItem.removeClass(self.classes.active);
-                    $.each(self.sizeValue, function(key, value) {
-                        self.$sizeItem.eq(key).data('size', value);
-                        if (!newValue) {
-                            return false;
-                        } else if (newValue === value) {
-                            self.$sizeItem.eq(key).addClass(self.classes.active);
+                set: function(newValue) {
+                    this.$items.removeClass(self.classes.active);
+                    for (var i = 0; i < this.sizeValues.length; i++) {
+                        if (newValue === this.sizeValues[i]) {
+                            self.value.size = newValue;
+                            this.$items.eq(i).addClass(self.classes.active);
                         }
+                    };
+                    self.$image.css({
+                        "background-size": newValue
                     });
                 },
 
                 bindEvent: function() {
-                    self.$size.on("click", "li", function() {
+                    var oneself = this;
+                    this.$size.on("click", "li", function() {
                         if (self.disabled) {
                             return;
                         }
-
                         var bgSize = $(this).data("size");
-                        if (self.size === bgSize) {
-                            return false;
-                        } else {
-                            self.size = bgSize;
-                        }
-                        if ($(this).hasClass(self.classes.active)) {
-                            return false;
-                        } else {
-                            self.$sizeItem.removeClass(self.classes.active);
-                            $(this).addClass(self.classes.active);
-                        }
+                        oneself.set(bgSize);
                         self._process();
+                        return false;
                     });
                 }
             },
 
             doAttachment: {
                 init: function() {
-                    if (!self.value) {
-                        self.attachment = self.options.attachment.default_value;
+                    var oneself = this;
+                    if (!self.value.attachment) {
+                        this.attachment = self.options.attachment.default_value;
                     } else {
-                        self.attachment = self.value.attachment;
+                        this.attachment = self.value.attachment;
                     }
 
                     var tpl_content = self.options.attachment.tpl().replace(/otherNamespace/g, self.options.attachment.namespace).replace(/namespace/g, self.namespace);
-                    self.$tpl_attachment = $(tpl_content);
-                    self.$image_wrap.after(self.$tpl_attachment);
+                    this.$tpl_attachment = $(tpl_content);
+                    self.$image_wrap.after(this.$tpl_attachment);
 
-                    self.$attachment = self.$extend.find('.' + self.namespace + '-attachment');
-                    self.$attachmentItem = self.$attachment.find('li');
-                    self.$dropdown = self.$extend.find('.' + self.options.attachment.namespace);
-                    self.doAttachment.setup(self.attachment);
-                },
+                    this.$attachment = self.$extend.find('.' + self.namespace + '-attachment');
+                    this.$items = this.$attachment.find('li');
+                    this.$dropdown = self.$extend.find('.' + self.options.attachment.namespace);
+                    this.attachmentValues = self.options.attachment.values;
 
-                setup: function(newValue) {
-                    self.select = 2;
-                    for (var i = 0; i < self.attachmentValue.length; i++) {
-                        if (self.attachmentValue[i] === newValue) {
-                            self.select = i;
-                        }
-                    }
-                },
+                    $.each(this.attachmentValues, function(key, value) {
+                        oneself.$items.eq(key).data('attachment', value);
+                    });
 
-                bindEvent: function() {
-                    self.$dropdown.dropdown({
+                    this.$dropdown.asDropdown({
                         namespace: self.options.attachment.namespace,
                         imitateSelect: true,
-                        select: self.select,
-                        onChange: function($elem) {
+                        data: "attachment",
+                        // select: oneself.attachment,
+                        onChange: function(value) {
                             if (self.disabled) {
                                 return;
                             }
-
-                            self.attachment = $elem.attr('value');
+                            self.value.attachment = value;
                             self._process();
+                            self.$image.css({
+                                "background-attachment": self.value.attachment
+                            });
                         }
                     });
+
+                    this.set(this.attachment);
+                },
+
+                set: function(value) {
+                    this.$dropdown.data('asDropdown').set(value);
                 }
             }
         });
 
         this._trigger('init');
         this.init();
-        // console.log(this,"thisxxxxthis",self);
     };
 
     Plugin.prototype = {
         constructor: Plugin,
         components: {},
-        /*
-            Public Method
-         */
+
         val: function(value, update) {
             if (typeof value === 'undefined') {
                 return this.value;
@@ -456,19 +429,14 @@
 
             if (update !== false) {
                 self.value = value;
-                self.image = value.image;
-                self.repeat = value.repeat;
-                self.size = value.size;
-                self.position = value.position;
-                self.attachment = value.attachment;
 
-                self.doRepeat.setup(value.repeat);
-                self.doSize.setup(value.size);
-                self.doPosition.setup(value.position);
-                self.doAttachment.setup(value.attachment);
+                self.setImage(value.image);
+                self.doRepeat.set(value.repeat);
+                self.doSize.set(value.size);
+                self.doPosition.set(value.position);
+                self.doAttachment.set(value.attachment);
 
                 self._process();
-
                 self.options.onChange.call(self, value);
             }
         },
@@ -477,22 +445,21 @@
             var self = this;
             self.value = null;
 
-            // this._setState('empty');
             if (update !== false) {
-                self.image = "";
-                self.repeat = "";
-                self.position = "";
-                self.attachment = "";
-                self.size = "";
-                self._setState(self.image);
-                self._returnInfo(self.image);
-                self.doRepeat.setup(self.repeat);
-                self.doSize.setup(self.size);
-                self.doPosition.setup(self.position);
-                self.doAttachment.setup(self.attachment);
+                var image = "",
+                    repeat = "",
+                    position = "",
+                    attachment = "",
+                    size = "";
+
+                self.setImage(image);
+
+                self.doRepeat.set(repeat);
+                self.doSize.set(size);
+                self.doPosition.set(position);
+                self.doAttachment.set(attachment);
                 self._process();
                 self.options.onChange.call(self, self.value);
-
             }
         },
 
@@ -502,17 +469,25 @@
             thumbnailUrl = self.options.getThumbnalil(image);
             self._setState(image);
             self._returnInfo(image);
-            if (image || image !== self.options.image) {
+            if (image === '') {
+                return;
+            } else if (image || image !== self.options.image) {
                 var img = new Image();
                 img.onload = function() {
-                    self.image = thumbnailUrl;
-                    self._returnInfo(self.image);
+                    self.value.image = thumbnailUrl;
+                    self._returnInfo(self.value.image);
                     self._process();
+                    self.$image.css({
+                        "background-image": 'url("' + self.value.image + '")'
+                    });
                 };
                 img.onerror = function() {
-                    self.image = image;
-                    self._returnInfo(self.image);
+                    self.value.image = image;
+                    self._returnInfo(image);
                     self._process();
+                    self.$image.css({
+                        "background-image": 'url("' + image + '")'
+                    });
                 };
                 img.src = thumbnailUrl;
             }
@@ -520,22 +495,22 @@
 
         setRepeat: function(repeat) {
             this.repeat = repeat;
-            this.doRepeat.setup(repeat);
+            this.doRepeat.set(repeat);
             this._process();
         },
         setSize: function(size) {
             this.size = size;
-            this.doSize.setup(size);
+            this.doSize.set(size);
             this._process();
         },
         setPosition: function(position) {
             this.position = position;
-            this.doPosition.setup(position);
+            this.doPosition.set(position);
             this._process();
         },
         setAttachment: function(attachment) {
             this.attachment = attachment;
-            this.doAttachment.setup(attachment);
+            this.doAttachment.set(attachment);
             this._process();
         },
 
@@ -557,11 +532,11 @@
     Plugin.defaults = {
         namespace: pluginName,
         skin: null,
+        name: null,
         image: "images\/defaults.png", // "..\/xxxx\/images\/xxxx.png"
         repeat: {
             default_value: 'repeat',
             values: ["no-repeat", "repeat", "repeat-x", "repeat-y"],
-            //this.options.tpl().replace(/namespace/g, this.namespace);
             tpl: function() {
                 return '<div class="namespace-repeat">' +
                     '<span class="namespace-repeat-title">Repeat</span>' +
@@ -601,39 +576,38 @@
                 return '<div class="namespace-size">' +
                     '<span class="namespace-size-title">Scalling</span>' +
                     '<ul class="namespace-size-content">' +
-                    '<li class="size_adapt-height"></li>' +
-                    '<li class="size_adapt-width"></li>' +
-                    '<li class="size_adapt-all"></li>' +
                     '<li class="size_adapt-auto"></li>' +
+                    '<li class="size_adapt-width"></li>' +
+                    '<li class="size_adapt-height"></li>' +
+                    '<li class="size_adapt-all"></li>' +
                     '</ul>' +
                     '</div>';
             }
         },
         attachment: {
-            namespace: 'az-dropdown',
+            namespace: 'asDropdown',
             default_value: 'scroll',
             values: ["scroll", "fixed", "inherit"],
             tpl: function() {
                 return '<div class="namespace-attachment">' +
                     '<span class="namespace-attachment-title">Attach</span>' +
                     '<div class="namespace-attachment-content">' +
-                    '<div class="otherNamespace namespace-dropdown-trigger"><span></span></div>' +
+                    '<div class="otherNamespace namespace-dropdown-trigger"><i class="asIcon-caret-down"></i></div>' +
                     '<ul>' +
-                    '<li class="attachment_scroll" value="scroll">scroll</li>' +
-                    '<li class="attachment_fixed" value="fixed">fixed</li>' +
-                    '<li class="attachment_default" value="inherit">default</li>' +
+                    '<li class="attachment_scroll">scroll</li>' +
+                    '<li class="attachment_fixed">fixed</li>' +
+                    '<li class="attachment_default">default</li>' +
                     '</ul>' +
                     '</div>' +
                     '</div>';
             }
         },
-        // position: null,
 
         tpl: function() {
             return '<div class="' + this.namespace + '">' +
-                '<div class="' + this.namespace + '-trigger">' +
+                '<div class="' + this.namespace + '-initiate">' +
                 '<div class="' + this.namespace + '-image-info"><span></span>Add Image</div>' +
-                '<div class="' + this.namespace + '-mask">Change</div>' +
+                '<div class="' + this.namespace + '-actions">Change</div>' +
                 '<a class="' + this.namespace + '-remove" href=""></a>' +
                 '</div>' +
                 '</div>';
@@ -678,7 +652,11 @@
                 imageName = imageData[2];
                 imageFormat = imageData[3];
 
-                return imagePath + 'thumbnail-' + imageName + imageFormat;
+                if (imageName.search('thumbnail') === 0) {
+                    return imagePath + imageName + imageFormat;
+                } else {
+                    return imagePath + 'thumbnail-' + imageName + imageFormat;
+                }
             }
         },
 

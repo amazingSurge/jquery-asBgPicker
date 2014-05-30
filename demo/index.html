@@ -10,11 +10,15 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
-        <link rel="stylesheet" href="css/dropdown.css">
+        <link rel="stylesheet" href="css/normalize.css">
+        <link rel="stylesheet" href="css/prism.css">
+        <link rel="stylesheet" href="css/main.css"> 
         <link rel="stylesheet" href="css/asBgPicker.css">
 
         <script src="js/vendor/jquery-1.9.1.min.js"></script>
-        <script type="text/javascript" src="js/jquery-dropdown.js"></script>
+        <script src="js/vendor/jquery.toc.min.js"></script>
+        <script src="js/vendor/prism.js"></script>
+        <script type="text/javascript" src="js/jquery-asDropdown.js"></script>
         <script src="../src/jquery-asBgPicker.js"></script>
         <style type="text/css">
             input {
@@ -23,24 +27,35 @@
         </style>
     </head>
 <body>
-<!--[if lt IE 7]>
-    <p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
-<![endif]-->
+    <div id="toc"></div>
+    <div class="container">
+        <div id="toc0"></div>
+        <h1>jQuery.asBgPicker</h1>
+        <section>
+            <div id="toc1"></div>
+            <h2>Example</h2>
+            <p>You can pass these options as key/value object to $.asBgPicker() method. </p>
 
-    <form action=""> 
-        <input type="text" class="bg-location" value='{"repeat":"repeat-x","position":"center center","attachment":"inherit","image": "images\/x_x2.png"}' />
-    </form>
-    <!-- "images\/x_x2.png","image":"images\/nvnv.png","thumbnails":"images\/thumbnails-minv.png" -->
+            <section>
+                <div id="toc2"></div>
+                <h3>default</h3>
+                <pre class="has-example"><code class="language-markup"></code></pre>
+                <div class="example">
+                    <form action=""> 
+                        <input type="text" class="bg-location" value='{"repeat":"repeat-x","position":"center center","attachment":"inherit","image": "images\/x_x2.png"}' />
+                    </form>
+                </div>
+            </section>
+        </section>
+    </div>
     
     <script type="text/javascript">
         $(document).ready(function() {
+            (function(){
+                $('#toc').toc();
+            })();
             $('.bg-location').asBgPicker({
                 onClickImage: function() {
-                    // this.setImage('images\/nvnv.png');
-                    // this.setRepeat("repeat-y");
-                    // this.setSize("100% 100%");
-                    // this.setPosition("center left");
-                    // this.setAttachment("scroll");
                     var value = {};
                     value.image = 'images/nvnv.png';
                     value.repeat = 'repeat-y';

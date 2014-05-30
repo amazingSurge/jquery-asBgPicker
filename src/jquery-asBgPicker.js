@@ -7,7 +7,7 @@
  */
 
 
-(function ($, document, window, undefined) {
+(function($, document, window, undefined) {
 
     "use strict";
 
@@ -19,6 +19,12 @@
 
         this.element = element;
         this.$element = $(element);
+
+        if (this.$element.attr('name')) {
+            this.name = this.$element.attr('name');
+        } else {
+            this.name = options.name;
+        }
 
         this.options = $.extend({}, Plugin.defaults, options, this.$element.data(), metas);
         this.namespace = this.options.namespace;
@@ -151,7 +157,8 @@
 
             _trigger: function(eventType) {
                 // event
-                self.$element.trigger(pluginName + '::' + eventType, self);
+                self.$element.trigger('asBgPicker::' + eventType, self);
+                self.$element.trigger(eventType + '.asBgPicker', self);
 
                 // callback
                 eventType = eventType.replace(/\b\w+\b/g, function(word) {
@@ -191,6 +198,9 @@
             _process: function() {
                 if (self.value === null) {
                     self.value = {};
+                }
+                if (typeof self.value.image === "undefined") {
+                    self.value.image = "";
                 }
                 self.options.onChange.call(self, self.value);
                 self.$element.val(self.options.process(self.value));
@@ -374,7 +384,7 @@
                         oneself.$items.eq(key).data('attachment', value);
                     });
 
-                    this.$dropdown.dropdown({
+                    this.$dropdown.asDropdown({
                         namespace: self.options.attachment.namespace,
                         imitateSelect: true,
                         data: "attachment",
@@ -395,7 +405,7 @@
                 },
 
                 set: function(value) {
-                    this.$dropdown.data('dropdown').set(value);
+                    this.$dropdown.data('asDropdown').set(value);
                 }
             }
         });
@@ -448,8 +458,6 @@
                     attachment = "",
                     size = "";
 
-                self._setState(image);
-                self._returnInfo(image);
                 self.setImage(image);
 
                 self.doRepeat.set(repeat);
@@ -467,7 +475,9 @@
             thumbnailUrl = self.options.getThumbnalil(image);
             self._setState(image);
             self._returnInfo(image);
-            if (image || image !== self.options.image) {
+            if (image === '') {
+                return;
+            } else if (image || image !== self.options.image) {
                 var img = new Image();
                 img.onload = function() {
                     self.value.image = thumbnailUrl;
@@ -528,6 +538,7 @@
     Plugin.defaults = {
         namespace: pluginName,
         skin: null,
+        name: null,
         image: "images\/defaults.png", // "..\/xxxx\/images\/xxxx.png"
         repeat: {
             default_value: 'repeat',
@@ -580,14 +591,14 @@
             }
         },
         attachment: {
-            namespace: 'az-dropdown',
+            namespace: 'asDropdown',
             default_value: 'scroll',
             values: ["scroll", "fixed", "inherit"],
             tpl: function() {
                 return '<div class="namespace-attachment">' +
                     '<span class="namespace-attachment-title">Attach</span>' +
                     '<div class="namespace-attachment-content">' +
-                    '<div class="otherNamespace namespace-dropdown-trigger"><span></span></div>' +
+                    '<div class="otherNamespace namespace-dropdown-trigger"><i class="asIcon-caret-down"></i></div>' +
                     '<ul>' +
                     '<li class="attachment_scroll">scroll</li>' +
                     '<li class="attachment_fixed">fixed</li>' +
@@ -647,7 +658,11 @@
                 imageName = imageData[2];
                 imageFormat = imageData[3];
 
-                return imagePath + 'thumbnail-' + imageName + imageFormat;
+                if (imageName.search('thumbnail') === 0) {
+                    return imagePath + imageName + imageFormat;
+                } else {
+                    return imagePath + 'thumbnail-' + imageName + imageFormat;
+                }
             }
         },
 

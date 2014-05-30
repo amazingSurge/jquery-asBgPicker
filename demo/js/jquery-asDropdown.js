@@ -1,10 +1,10 @@
-/*! jquery dropdown - v0.1.1 - 2014-03-18
-* https://github.com/amazingSurge/jquery-dropdown
+/*! jquery asDropdown - v0.1.1 - 2014-03-28
+* https://github.com/amazingSurge/jquery-asDropdown
 * Copyright (c) 2014 amazingSurge; Licensed MIT */
 /* global jQuery */
 
 (function($) {
-    var Dropdown = $.dropdown = function(element, options) {
+    var AsDropdown = $.dropdown = function(element, options) {
         this.element = element;
         this.$element = $(element);
         this.$parent = this.$element.parent();
@@ -12,12 +12,12 @@
         // options
         var meta_data = [];
         $.each(this.$element.data(), function(k, v) {
-            var re = new RegExp("^dropdown", "i");
+            var re = new RegExp("^asDropdown", "i");
             if (re.test(k)) {
                 meta_data[k.toLowerCase().replace(re, '')] = v;
             }
         });
-        this.options = $.extend(true, {}, Dropdown.defaults, options, meta_data);
+        this.options = $.extend(true, {}, AsDropdown.defaults, options, meta_data);
         this.namespace = this.options.namespace;
         this.classes = {
             skin: this.namespace + '_' + this.options.skin,
@@ -48,20 +48,20 @@
         this.init();
     };
 
-    Dropdown.prototype = {
-        constructor: Dropdown,
+    AsDropdown.prototype = {
+        constructor: AsDropdown,
         init: function() {
             var self = this;
             this.$parent.addClass(this.classes.wrapper);
             this.$element.addClass(this.namespace).addClass(this.classes.trigger);
             this.$panel.addClass(this.classes.panel);
 
-            this.$element.on('click.dropdown', function() {
+            this.$element.on('click.asDropdown', function() {
                 self.toggle.call(self);
                 return false;
             });
 
-            this.$panel.on('click.dropdown', 'li', function() {
+            this.$panel.on('click.asDropdown', 'li', function() {
                 self.set($(this).data(self.options.data));
                 self.hide();
                 return false;
@@ -76,7 +76,7 @@
         },
         _trigger: function(eventType) {
             // event
-            this.$element.trigger('dropdown::' + eventType, this);
+            this.$element.trigger('asDropdown::' + eventType, this);
 
             // callback
             eventType = eventType.replace(/\b\w+\b/g, function(word) {
@@ -98,7 +98,7 @@
                 this._generateMask();
             }
 
-            $(window).on('resize.dropdown', function() {
+            $(window).on('resize.asDropdown', function() {
                 self._position();
                 return false;
             });
@@ -117,7 +117,7 @@
 
             this.$element.removeClass(this.classes.show);
             this.$panel.removeClass(this.classes.show);
-            $(document).off('mousedown.dropdown');
+            $(document).off('mousedown.asDropdown');
 
             this._trigger('hide');
         },
@@ -146,14 +146,14 @@
         _generateMask: function() {
             var self = this;
             this.$mask = $('<div></div>').addClass(this.classes.mask).appendTo(this.$parent);
-            this.$mask.on('click.dropdown', function() {
+            this.$mask.on('click.asDropdown', function() {
                 self.hide();
                 return false;
             });
         },
         _clearMask: function() {
             if (this.$mask) {
-                this.$mask.off('.dropdown');
+                this.$mask.off('.asDropdown');
                 this.$mask.remove();
                 this.$mask = null;
             }
@@ -208,14 +208,14 @@
         },
         destory: function() {
             this.hide();
-            this.$element.off('.dropdown');
+            this.$element.off('.asDropdown');
             this.$element.remove();
-            $(window).off('.dropdown');
+            $(window).off('.asDropdown');
         }
     };
 
-    Dropdown.defaults = {
-        namespace: 'dropdown',
+    AsDropdown.defaults = {
+        namespace: 'asDropdown',
         skin: null,
         panel: '+', //jquery selector to find content in the page, or '+' means adjacent siblings
         clickoutHide: true, //When clicking outside of the dropdown, trigger hide event
@@ -230,21 +230,21 @@
         onChange: null
     };
 
-    $.fn.dropdown = function(options) {
+    $.fn.asDropdown = function(options) {
         if (typeof options === 'string') {
             var method = options;
             var method_arguments = arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : undefined;
 
             return this.each(function() {
-                var api = $.data(this, 'dropdown');
+                var api = $.data(this, 'asDropdown');
                 if (typeof api[method] === 'function') {
                     api[method].apply(api, method_arguments);
                 }
             });
         } else {
             return this.each(function() {
-                if (!$.data(this, 'dropdown')) {
-                    $.data(this, 'dropdown', new Dropdown(this, options));
+                if (!$.data(this, 'asDropdown')) {
+                    $.data(this, 'asDropdown', new AsDropdown(this, options));
                 }
             });
         }
