@@ -132,14 +132,14 @@ module.exports = function(grunt) {
     });
 
     // Default task.
-    grunt.registerTask('default', ['jshint', 'jsbeautifier', 'clean', 'copy', 'concat', 'uglify', 'recess']);
-    grunt.registerTask('dist', ['jsbeautifier', 'concat', 'uglify']);
+    grunt.registerTask('default', ['js', 'dist', 'css']);
+
+    grunt.registerTask('dist', ['clean', 'concat', 'uglify']);
     grunt.registerTask('css', ['recess']);
-    grunt.registerTask('copyfiles', ['copy']);
-    grunt.registerTask('js', ['jshint', 'jsbeautifier']);
     grunt.registerTask('version', [
         'replace:bower',
         'replace:jquery'
     ]);
+    grunt.registerTask('js', ['jshint', 'jsbeautifier']);
 
 };
