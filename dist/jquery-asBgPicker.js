@@ -1,4 +1,4 @@
-/*! jQuery asBgPicker - v0.1.0 - 2014-07-03
+/*! jQuery asBgPicker - v0.1.0 - 2014-07-04
 * https://github.com/amazingSurge/jquery-asBgPicker
 * Copyright (c) 2014 amazingSurge; Licensed GPL */
 (function($, document, window, undefined) {
@@ -9,20 +9,11 @@
 
     // main constructor
     var Plugin = $[pluginName] = function(element, options) {
-        var metas = {};
-
         this.element = element;
         this.$element = $(element);
 
-        if (this.$element.attr('name')) {
-            this.name = this.$element.attr('name');
-        } else {
-            this.name = options.name;
-        }
-
-        this.options = $.extend({}, Plugin.defaults, options, this.$element.data(), metas);
+        this.options = $.extend({}, Plugin.defaults, options, this.$element.data());
         this.namespace = this.options.namespace;
-        this.components = $.extend(true, {}, this.components);
 
         // public properties
         this.classes = {
@@ -33,8 +24,6 @@
             hide: this.namespace + '_hide',
             show: this.namespace + '_show',
             hasImage: this.namespace + '_hasImage'
-            // empty: this.namespace + '_empty',
-            // present: this.namespace + '_present'
         };
 
         // flag
@@ -50,13 +39,17 @@
                     self.$wrap.addClass(self.classes.skin);
                 }
 
-                self._getValue();
+                self.value = this.options.parse(this.$element.val());
+
+                self.set(self.value, false);
 
                 if (self.options.disabled) {
                     self.disable();
                 }
                 // init
-                self.setImage(self.value.image);
+                if (self.value.image) {
+                    self.setImage(self.value.image);
+                }
 
                 self.doSize.init();
                 self.doAttachment.init();
@@ -97,7 +90,9 @@
                     self.$extend.removeClass(self.classes.hide).addClass(self.classes.show);
                 });
 
-                self.$remove.on("click", function() {
+                self.$remove.on("click", function(e) {
+                    e.preventDefault();
+
                     if (self.disabled) {
                         return;
                     }
@@ -131,7 +126,7 @@
                         return;
                     }
 
-                    self.options.onClickImage.call(self);
+                    self.options.select.call(self);
                 });
             },
             _createHtml: function() {
@@ -164,15 +159,6 @@
                     self.options[onFunction].apply(self, method_arguments);
                 }
             },
-            _getValue: function() {
-                var value = self.$element.val();
-
-                if (value) {
-                    self.value = self.options.parse(value);
-                } else {
-                    return self.value = '';
-                }
-            },
             _setState: function(image) {
                 if (!image || image === self.options.image) {
                     self.$initiate.removeClass(self.classes.hasImage);
@@ -189,23 +175,20 @@
                     $(self.$info)[0].lastChild.nodeValue = img_name;
                 }
             },
-            _process: function() {
-                if (self.value === null || self.value.image === "undefined") {
+            _update: function() {
+                if (self.value === null) {
                     self.value = {};
                 }
 
-                self.options.onChange.call(self, self.value);
-                self.$element.val(self.options.process(self.value));
+                self.$element.val(self.val());
+                self._trigger('change', self.val());
             },
 
             doRepeat: {
+                values: self.options.repeat.values,
+                default_value: self.options.repeat.default_value,
                 init: function() {
-                    var oneself = this;
-                    if (!self.value.repeat) {
-                        this.repeat = self.options.repeat.default_value;
-                    } else {
-                        this.repeat = self.value.repeat;
-                    }
+                    var that = this;
 
                     var tpl_content = self.options.repeat.tpl().replace(/namespace/g, self.namespace);
                     this.$tpl_repeat = $(tpl_content);
@@ -213,51 +196,58 @@
 
                     this.$repeat = self.$extend.find('.' + self.namespace + '-repeat');
                     this.$items = this.$repeat.find('li');
-                    this.repeatValues = self.options.repeat.values;
 
-                    $.each(this.repeatValues, function(key, value) {
-                        oneself.$items.eq(key).data('repeat', value);
+                    $.each(this.values, function(key, value) {
+                        that.$items.eq(key).data('repeat', value);
                     });
 
-                    this.set(this.repeat);
+                    var value = typeof self.value.repeat !== 'undefined' ? self.value.repeat : this.default_value;
+                    this.set(value);
+
                     this.bindEvent();
                 },
 
-                set: function(newValue) {
+                set: function(value) {
+                    var found = false;
                     this.$items.removeClass(self.classes.active);
-                    for (var i = 0; i < this.repeatValues.length; i++) {
-                        if (newValue === this.repeatValues[i]) {
-                            self.value.repeat = newValue;
+                    for (var i = 0; i < this.values.length; i++) {
+                        if (value === this.values[i]) {
+                            self.value.repeat = value;
                             this.$items.eq(i).addClass(self.classes.active);
+                            self.$image.css({
+                                "background-repeat": value
+                            });
+                            found = true;
                         }
-                    };
-                    self.$image.css({
-                        "background-repeat": newValue
-                    });
+                    }
+                    if (!found) {
+                        this.set(this.default_value);
+                    }
+                },
+
+                clear: function() {
+                    this.set(this.default_value);
                 },
 
                 bindEvent: function() {
-                    var oneself = this;
+                    var that = this;
                     this.$repeat.on("click", "li", function() {
                         if (self.disabled) {
                             return;
                         }
-                        var bgRepeat = $(this).data("repeat");
-                        oneself.set(bgRepeat);
-                        self._process();
+                        var value = $(this).data("repeat");
+                        that.set(value);
+                        self._update();
                         return false;
                     });
                 }
             },
 
             doPosition: {
+                values: self.options.position.values,
+                default_value: self.options.position.default_value,
                 init: function() {
-                    var oneself = this;
-                    if (!self.value.position) {
-                        this.position = self.options.position.default_value;
-                    } else {
-                        this.position = self.value.position;
-                    }
+                    var that = this;
 
                     var tpl_content = self.options.position.tpl().replace(/namespace/g, self.namespace);
                     this.$tpl_position = $(tpl_content);
@@ -265,51 +255,59 @@
 
                     this.$position = self.$extend.find('.' + self.namespace + '-position');
                     this.$items = this.$position.find('li');
-                    this.positionValues = self.options.position.values;
 
-                    $.each(this.positionValues, function(key, value) {
-                        oneself.$items.eq(key).data('position', value);
+                    $.each(this.values, function(key, value) {
+                        that.$items.eq(key).data('position', value);
                     });
 
-                    this.set(this.position);
+                    var value = typeof self.value.position !== 'undefined' ? self.value.position : this.default_value;
+                    this.set(value);
+
                     this.bindEvent();
                 },
 
-                set: function(newValue) {
+                set: function(value) {
+                    var found = false;
                     this.$items.removeClass(self.classes.active);
-                    for (var i = 0; i < this.positionValues.length; i++) {
-                        if (newValue === this.positionValues[i]) {
-                            self.value.position = newValue;
+                    for (var i = 0; i < this.values.length; i++) {
+                        if (value === this.values[i]) {
+                            self.value.position = value;
                             this.$items.eq(i).addClass(self.classes.active);
+                            self.$image.css({
+                                "background-position": value
+                            });
+                            found = true;
                         }
-                    };
-                    self.$image.css({
-                        "background-position": newValue
-                    });
+                    }
+
+                    if (!found) {
+                        this.set(this.default_value);
+                    }
+                },
+
+                clear: function() {
+                    this.set(this.default_value);
                 },
 
                 bindEvent: function() {
-                    var oneself = this;
+                    var that = this;
                     this.$position.on("click", "li", function() {
                         if (self.disabled) {
                             return;
                         }
-                        var bgPosition = $(this).data("position");
-                        oneself.set(bgPosition);
-                        self._process();
+                        var value = $(this).data("position");
+                        that.set(value);
+                        self._update();
                         return false;
                     });
                 }
             },
 
             doSize: {
+                values: self.options.size.values,
+                default_value: self.options.size.default_value,
                 init: function() {
-                    var oneself = this;
-                    if (!self.value.size) {
-                        this.size = self.options.size.default_value;
-                    } else {
-                        this.size = self.value.size;
-                    }
+                    var that = this;
 
                     var tpl_content = self.options.size.tpl().replace(/namespace/g, self.namespace);
                     this.$tpl_size = $(tpl_content);
@@ -317,52 +315,58 @@
 
                     this.$size = self.$extend.find('.' + self.namespace + '-size');
                     this.$items = this.$size.find('li');
-                    this.sizeValues = self.options.size.values;
 
-                    $.each(this.sizeValues, function(key, value) {
-                        oneself.$items.eq(key).data('size', value);
+                    $.each(this.values, function(key, value) {
+                        that.$items.eq(key).data('size', value);
                     });
 
-                    this.set(this.size);
+                    var value = typeof self.value.size !== 'undefined' ? self.value.size : this.default_value;
+                    this.set(value);
+
                     this.bindEvent();
                 },
 
-                set: function(newValue) {
+                set: function(value) {
+                    var found = false;
                     this.$items.removeClass(self.classes.active);
-                    for (var i = 0; i < this.sizeValues.length; i++) {
-                        if (newValue === this.sizeValues[i]) {
-                            self.value.size = newValue;
+                    for (var i = 0; i < this.values.length; i++) {
+                        if (value === this.values[i]) {
+                            self.value.size = value;
                             this.$items.eq(i).addClass(self.classes.active);
+                            self.$image.css({
+                                "background-size": value
+                            });
+                            found = true;
                         }
-                    };
-                    self.$image.css({
-                        "background-size": newValue
-                    });
+                    }
+                    if (!found) {
+                        this.set(this.default_value);
+                    }
+                },
+
+                clear: function() {
+                    this.set(this.default_value);
                 },
 
                 bindEvent: function() {
-                    var oneself = this;
+                    var that = this;
                     this.$size.on("click", "li", function() {
                         if (self.disabled) {
                             return;
                         }
-                        var bgSize = $(this).data("size");
-                        oneself.set(bgSize);
-                        self._process();
+                        var value = $(this).data("size");
+                        that.set(value);
+                        self._update();
                         return false;
                     });
                 }
             },
 
             doAttachment: {
+                values: self.options.attachment.values,
+                default_value: self.options.attachment.default_value,
                 init: function() {
-                    var oneself = this;
-                    if (!self.value.attachment) {
-                        this.attachment = self.options.attachment.default_value;
-                    } else {
-                        this.attachment = self.value.attachment;
-                    }
-
+                    var that = this;
                     var tpl_content = self.options.attachment.tpl().replace(/otherNamespace/g, self.options.attachment.namespace).replace(/namespace/g, self.namespace);
                     this.$tpl_attachment = $(tpl_content);
                     self.$image_wrap.after(this.$tpl_attachment);
@@ -370,34 +374,50 @@
                     this.$attachment = self.$extend.find('.' + self.namespace + '-attachment');
                     this.$items = this.$attachment.find('li');
                     this.$dropdown = self.$extend.find('.' + self.options.attachment.namespace);
-                    this.attachmentValues = self.options.attachment.values;
+                    this.values = self.options.attachment.values;
 
-                    $.each(this.attachmentValues, function(key, value) {
-                        oneself.$items.eq(key).data('attachment', value);
+                    $.each(this.values, function(key, value) {
+                        that.$items.eq(key).data('attachment', value);
                     });
 
                     this.$dropdown.asDropdown({
                         namespace: self.options.attachment.namespace,
                         imitateSelect: true,
                         data: "attachment",
-                        // select: oneself.attachment,
+                        // select: that.attachment,
                         onChange: function(value) {
                             if (self.disabled) {
                                 return;
                             }
                             self.value.attachment = value;
-                            self._process();
+                            self._update();
                             self.$image.css({
                                 "background-attachment": self.value.attachment
                             });
                         }
                     });
 
-                    this.set(this.attachment);
+                    var value = typeof self.value.attachment !== 'undefined' ? self.value.attachment : this.default_value;
+                    this.set(value);
                 },
 
                 set: function(value) {
-                    this.$dropdown.data('asDropdown').set(value);
+                    var found = false;
+                    this.$items.removeClass(self.classes.active);
+                    for (var i = 0; i < this.values.length; i++) {
+                        if (value === this.values[i]) {
+                            this.$dropdown.data('asDropdown').set(value);
+                            found = true;
+                        }
+                    }
+
+                    if (!found) {
+                        this.set(this.default_value);
+                    }
+                },
+
+                clear: function() {
+                    this.set(this.default_value);
                 }
             }
         });
@@ -408,56 +428,67 @@
 
     Plugin.prototype = {
         constructor: Plugin,
-        components: {},
 
-        val: function(value, update) {
+        val: function(value) {
             if (typeof value === 'undefined') {
-                return this.value;
+                return this.options.process(this.value);
             }
 
-            if (value) {
-                this.set(value, update);
+            var value_obj = this.options.parse(value);
+
+            if (value_obj) {
+                this.set(value_obj);
             } else {
-                this.clear(update);
+                this.clear();
             }
         },
 
         set: function(value, update) {
-            var self = this;
+            this.value = value;
 
             if (update !== false) {
-                self.value = value;
+                if (typeof value.image !== 'undefined') {
+                    this.setImage(value.image);
+                } else {
+                    this.setImage('');
+                }
+                if (typeof value.repeat !== 'undefined') {
+                    this.doRepeat.set(value.repeat);
+                } else {
+                    this.doRepeat.clear();
+                }
+                if (typeof value.size !== 'undefined') {
+                    this.doSize.set(value.size);
+                } else {
+                    this.doSize.clear();
+                }
+                if (typeof value.position !== 'undefined') {
+                    this.doPosition.set(value.position);
+                } else {
+                    this.doPosition.clear();
+                }
+                if (typeof value.attachment !== 'undefined') {
+                    this.doAttachment.set(value.attachment);
+                } else {
+                    this.doAttachment.clear();
+                }
 
-                self.setImage(value.image);
-                self.doRepeat.set(value.repeat);
-                self.doSize.set(value.size);
-                self.doPosition.set(value.position);
-                self.doAttachment.set(value.attachment);
-
-                self._process();
-                self.options.onChange.call(self, value);
+                this._update();
             }
         },
 
         clear: function(update) {
-            var self = this;
-            self.value = null;
+            this.value = {};
 
             if (update !== false) {
-                var image = "",
-                    repeat = "",
-                    position = "",
-                    attachment = "",
-                    size = "";
+                var image = "";
+                this.setImage(image);
 
-                self.setImage(image);
-
-                self.doRepeat.set(repeat);
-                self.doSize.set(size);
-                self.doPosition.set(position);
-                self.doAttachment.set(attachment);
-                self._process();
-                self.options.onChange.call(self, self.value);
+                this.doRepeat.clear();
+                this.doSize.clear();
+                this.doPosition.clear();
+                this.doAttachment.clear();
+                this._update();
             }
         },
 
@@ -470,14 +501,13 @@
                 self.$image.css({
                     "background-image": 'none'
                 });
-                return;
             } else if (image || image !== self.options.image) {
                 thumbnailUrl = self.options.getThumbnalil(image);
                 var img = new Image();
                 img.onload = function() {
                     self.value.image = thumbnailUrl;
                     self._returnInfo(self.value.image);
-                    self._process();
+                    self._update();
                     self.$image.css({
                         "background-image": 'url("' + self.value.image + '")'
                     });
@@ -485,7 +515,7 @@
                 img.onerror = function() {
                     self.value.image = image;
                     self._returnInfo(image);
-                    self._process();
+                    self._update();
                     self.$image.css({
                         "background-image": 'none'
                     });
@@ -495,24 +525,20 @@
         },
 
         setRepeat: function(repeat) {
-            this.repeat = repeat;
             this.doRepeat.set(repeat);
-            this._process();
+            this._update();
         },
         setSize: function(size) {
-            this.size = size;
             this.doSize.set(size);
-            this._process();
+            this._update();
         },
         setPosition: function(position) {
-            this.position = position;
             this.doPosition.set(position);
-            this._process();
+            this._update();
         },
         setAttachment: function(attachment) {
-            this.attachment = attachment;
             this.doAttachment.set(attachment);
-            this._process();
+            this._update();
         },
 
         enable: function() {
@@ -533,7 +559,6 @@
     Plugin.defaults = {
         namespace: pluginName,
         skin: null,
-        name: null,
         image: "images\/defaults.png", // "..\/xxxx\/images\/xxxx.png"
         repeat: {
             default_value: 'repeat',
@@ -624,7 +649,7 @@
         },
 
         process: function(value) {
-            if (value) {
+            if (value && typeof value.image !== 'undefined' && value.image !== '') {
                 return JSON.stringify(value);
             } else {
                 return '';
@@ -635,7 +660,7 @@
             if (value) {
                 return $.parseJSON(value);
             } else {
-                return null;
+                return {};
             }
         },
 
@@ -656,13 +681,8 @@
                 return imagePath + 'thumbnail-' + imageName + imageFormat;
             }
         },
-
-        onChange: function() {},
-        onClickImage: function() {}
-    };
-
-    Plugin.registerComponent = function(component, methods) {
-        Plugin.prototype.components[component] = methods;
+        select: function() {},
+        onChange: function() {}
     };
 
     $.fn[pluginName] = function(options) {
@@ -672,7 +692,7 @@
 
             if (/^\_/.test(method)) {
                 return false;
-            } else if ((/^(getTabs)$/.test(method)) || (method === 'val' && method_arguments === undefined)) {
+            } else if (method === 'val' && method_arguments === undefined) {
                 var api = this.first().data(pluginName);
                 if (api && typeof api[method] === 'function') {
                     return api[method].apply(api, method_arguments);
