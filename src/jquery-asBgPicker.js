@@ -151,8 +151,8 @@
                 self.$actions = self.$wrap.find('.' + self.namespace + '-actions');
                 self.$close = self.$extend.find('.' + self.namespace + '-close');
 
-                self.$image = self.$extend.find('.' + self.namespace + '-image');
                 self.$image_wrap = self.$extend.find('.' + self.namespace + '-image-wrap');
+                self.$image = self.$extend.find('.' + self.namespace + '-image');
             },
 
             _trigger: function(eventType) {
@@ -176,7 +176,7 @@
                 if (value) {
                     self.value = self.options.parse(value);
                 } else {
-                    return false;
+                    return self.value = '';
                 }
             },
             _setState: function(image) {
@@ -196,12 +196,10 @@
                 }
             },
             _process: function() {
-                if (self.value === null) {
+                if (self.value === null || self.value.image === "undefined") {
                     self.value = {};
                 }
-                if (typeof self.value.image === "undefined") {
-                    self.value.image = "";
-                }
+
                 self.options.onChange.call(self, self.value);
                 self.$element.val(self.options.process(self.value));
             },
@@ -472,12 +470,15 @@
         setImage: function(image) {
             var thumbnailUrl,
                 self = this;
-            thumbnailUrl = self.options.getThumbnalil(image);
             self._setState(image);
             self._returnInfo(image);
-            if (image === '') {
+            if (image === '' || typeof image === 'undefined') {
+                self.$image.css({
+                    "background-image": 'none'
+                });
                 return;
             } else if (image || image !== self.options.image) {
+                thumbnailUrl = self.options.getThumbnalil(image);
                 var img = new Image();
                 img.onload = function() {
                     self.value.image = thumbnailUrl;
@@ -492,7 +493,7 @@
                     self._returnInfo(image);
                     self._process();
                     self.$image.css({
-                        "background-image": 'url("' + image + '")'
+                        "background-image": 'none'
                     });
                 };
                 img.src = thumbnailUrl;
@@ -650,19 +651,15 @@
                 imageFormat,
                 imageName;
 
-            if (!image) {
-                return false;
-            } else {
-                imageData = image.match(/([\S]+[\/])([\S]+)(\.+\w+$)/i);
-                imagePath = imageData[1];
-                imageName = imageData[2];
-                imageFormat = imageData[3];
+            imageData = image.match(/([\S]+[\/])([\S]+)(\.+\w+$)/i);
+            imagePath = imageData[1];
+            imageName = imageData[2];
+            imageFormat = imageData[3];
 
-                if (imageName.search('thumbnail') === 0) {
-                    return imagePath + imageName + imageFormat;
-                } else {
-                    return imagePath + 'thumbnail-' + imageName + imageFormat;
-                }
+            if (imageName.search('thumbnail') === 0) {
+                return imagePath + imageName + imageFormat;
+            } else {
+                return imagePath + 'thumbnail-' + imageName + imageFormat;
             }
         },
 
