@@ -195,8 +195,8 @@
   background-color: #fff;
 }
 
-.asBgPicker-initiate > i,
-.asBgPicker-info > i {
+.asBgPicker-initiate-image > i,
+.asBgPicker-info-image > i {
   margin-right: 10px;
   font-family: 'asFont';
   font-size: 31px;
@@ -212,8 +212,8 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.asBgPicker-initiate > i:before,
-.asBgPicker-info > i:before {
+.asBgPicker-initiate-image > i:before,
+.asBgPicker-info-image > i:before {
   content: "\e624";
 }
 

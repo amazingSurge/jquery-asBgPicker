@@ -156,7 +156,7 @@
                 this.$initiate = $('.' + this.namespace + '-initiate', this.$wrap);
 
                 this.$info = $('.' + this.namespace + '-info', this.$wrap);
-                this.$infoName = $('.' + this.namespace + '-info-name', this.$info);
+                this.$info_imageName = $('.' + this.namespace + '-info-image-name', this.$info);
                 this.$remove = $('.' + this.namespace + '-info-remove', this.$info);
                 this.$change = $('.' + this.namespace + '-info-change', this.$info);
 
@@ -191,10 +191,10 @@
             _returnInfo: function(image) {
                 var img_name;
                 if (!image || image === self.options.image) {
-                    self.$infoName.text(self.strings.placeholder);
+                    self.$info_imageName.text(self.strings.placeholder);
                 } else {
                     img_name = image.match(/([\S]+[\/])([\S]+\w+$)/i)[2];
-                    self.$infoName.text(img_name);
+                    self.$info_imageName.text(img_name);
                 }
             },
             _update: function() {
@@ -663,7 +663,9 @@
                 '<i></i>{{strings.placeholder}}' +
                 '</div>' +
                 '<div class="{{namespace}}-info">' +
-                '<i></i><span class="{{namespace}}-info-name">{{strings.placeholder}}</span>' +
+                '<div class="{{namespace}}-info-image">' +
+                '<i></i><span class="{{namespace}}-info-image-name">{{strings.placeholder}}</span>' +
+                '</div>' +
                 '<div class="{{namespace}}-info-change">{{strings.change}}</div>' +
                 '<a class="{{namespace}}-info-remove" href=""></a>' +
                 '</div>' +
