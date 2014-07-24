@@ -1,8 +1,7 @@
-/*! jQuery asBgPicker - v0.1.0 - 2014-07-04
+/*! jQuery asBgPicker - v0.1.1 - 2014-07-24
 * https://github.com/amazingSurge/jquery-asBgPicker
 * Copyright (c) 2014 amazingSurge; Licensed GPL */
 (function($, document, window, undefined) {
-
     "use strict";
 
     var pluginName = 'asBgPicker';
@@ -13,6 +12,15 @@
         this.$element = $(element);
 
         this.options = $.extend({}, Plugin.defaults, options, this.$element.data());
+
+        // load lang strings
+        if (typeof Plugin.Strings[this.options.lang] === 'undefined') {
+            this.lang = 'en';
+        } else {
+            this.lang = this.options.lang;
+        }
+        this.strings = $.extend({}, Plugin.Strings[this.lang], this.options.strings);
+
         this.namespace = this.options.namespace;
 
         // public properties
@@ -21,9 +29,10 @@
             skin: this.namespace + '_' + this.options.skin,
             disabled: this.namespace + '_disabled',
             active: this.namespace + '_active',
-            hide: this.namespace + '_hide',
-            show: this.namespace + '_show',
-            hasImage: this.namespace + '_hasImage'
+            hover: this.namespace + '_hover',
+            empty: this.namespace + '_empty',
+            exist: this.namespace + '_exist',
+            expand: this.namespace + '_expand'
         };
 
         // flag
@@ -33,66 +42,72 @@
         var self = this;
         $.extend(self, {
             init: function() {
-                self._createHtml();
+                this._createHtml();
 
-                if (self.options.skin) {
-                    self.$wrap.addClass(self.classes.skin);
+                if (this.options.skin) {
+                    this.$wrap.addClass(this.classes.skin);
                 }
 
-                self.value = this.options.parse(this.$element.val());
+                this.value = this.options.parse(this.$element.val());
 
-                self.set(self.value, false);
+                this.set(this.value, false);
 
-                if (self.options.disabled) {
-                    self.disable();
+                if (this.options.disabled) {
+                    this.disable();
                 }
                 // init
-                if (self.value.image) {
-                    self.setImage(self.value.image);
+                if (this.value.image) {
+                    this.setImage(this.value.image);
+                } else {
+                    this.$wrap.addClass(this.classes.empty);
                 }
 
-                self.doSize.init();
-                self.doAttachment.init();
-                self.doPosition.init();
-                self.doRepeat.init();
+                this.doSize.init();
+                this.doAttachment.init();
+                this.doPosition.init();
+                this.doRepeat.init();
 
-                self._bindEvent();
+                this.$wrap.addClass(this.classes.exist);
 
-                self.initialed = true;
+                this._bindEvent();
+
+                this.initialed = true;
                 // after init end trigger 'ready'
-                self._trigger('ready');
+                this._trigger('ready');
             },
 
             _bindEvent: function() {
-                self.$initiate.on('mouseenter', function() {
+                this.$initiate.on('click', function() {
                     if (self.disabled) {
                         return;
                     }
 
-                    self.$actions.addClass(self.classes.show);
-                    self.$remove.addClass(self.classes.show);
+                    self.$wrap.addClass(self.classes.expand).removeClass(self.classes.exist);
+                });
+
+                this.$info.on('mouseenter', function() {
+                    if (self.disabled) {
+                        return;
+                    }
+
+                    $(this).addClass(self.classes.hover);
                 }).on('mouseleave', function() {
                     if (self.disabled) {
                         return;
                     }
 
-                    self.$actions.removeClass(self.classes.show);
-                    self.$remove.removeClass(self.classes.show);
+                    $(this).removeClass(self.classes.hover);
                 });
 
-                self.$actions.on("click", function() {
+                this.$change.on("click", function() {
                     if (self.disabled) {
                         return;
                     }
 
-                    self.$initiate.addClass(self.classes.hide);
-                    self.$wrap.append(self.$extend);
-                    self.$extend.removeClass(self.classes.hide).addClass(self.classes.show);
+                    self.$wrap.addClass(self.classes.expand).removeClass(self.classes.exist);
                 });
 
-                self.$remove.on("click", function(e) {
-                    e.preventDefault();
-
+                this.$remove.on("click", function(e) {
                     if (self.disabled) {
                         return;
                     }
@@ -102,18 +117,16 @@
                     return false;
                 });
 
-                self.$close.on("click", function() {
+                this.$close.on("click", function() {
                     if (self.disabled) {
                         return;
                     }
 
-                    self.$extend.removeClass(self.classes.show).addClass(self.classes.hide);
-                    self.$initiate.removeClass(self.classes.hide);
-
+                    self.$wrap.addClass(self.classes.exist).removeClass(self.classes.expand);
                     return false;
                 });
 
-                self.$element.on('onChange', function() {
+                this.$element.on('onChange', function() {
                     if (self.disabled) {
                         return;
                     }
@@ -121,7 +134,7 @@
                     self.options.onChange.call(self);
                 });
 
-                self.$image.on('click', function() {
+                this.$image.on('click', function() {
                     if (self.disabled) {
                         return;
                     }
@@ -130,18 +143,22 @@
                 });
             },
             _createHtml: function() {
-                self.$wrap = $(self.options.tpl());
-                self.$extend = $(self.options.tpl_extend());
-                self.$element.after(self.$wrap);
+                this.$wrap = $(this.options.tpl().replace(/\{\{namespace\}\}/g, this.namespace)
+                    .replace(/\{\{strings.placeholder\}\}/g, this.strings.placeholder)
+                    .replace(/\{\{strings.change\}\}/g, this.strings.change));
+                this.$element.after(this.$wrap);
 
-                self.$initiate = self.$wrap.find('.' + self.namespace + '-initiate');
-                self.$info = self.$initiate.find('.' + self.namespace + '-image-info');
-                self.$remove = self.$wrap.find('.' + self.namespace + '-remove');
-                self.$actions = self.$wrap.find('.' + self.namespace + '-actions');
-                self.$close = self.$extend.find('.' + self.namespace + '-close');
+                this.$initiate = $('.' + this.namespace + '-initiate', this.$wrap);
 
-                self.$image_wrap = self.$extend.find('.' + self.namespace + '-image-wrap');
-                self.$image = self.$extend.find('.' + self.namespace + '-image');
+                this.$info = $('.' + this.namespace + '-info', this.$wrap);
+                this.$infoName = $('.' + this.namespace + '-info-name', this.$info);
+                this.$remove = $('.' + this.namespace + '-info-remove', this.$info);
+                this.$change = $('.' + this.namespace + '-info-change', this.$info);
+
+                this.$expand = $('.' + this.namespace + '-expand', this.$wrap);
+                this.$close = $('.' + this.namespace + '-expand-close', this.$expand);
+                this.$image_wrap = $('.' + this.namespace + '-expand-image-wrap', this.$expand);
+                this.$image = $('.' + this.namespace + '-expand-image', this.$expand);
             },
 
             _trigger: function(eventType) {
@@ -161,18 +178,18 @@
             },
             _setState: function(image) {
                 if (!image || image === self.options.image) {
-                    self.$initiate.removeClass(self.classes.hasImage);
+                    self.$wrap.addClass(self.classes.empty);
                 } else {
-                    self.$initiate.addClass(self.classes.hasImage);
+                    self.$wrap.removeClass(self.classes.empty);
                 }
             },
             _returnInfo: function(image) {
                 var img_name;
                 if (!image || image === self.options.image) {
-                    $(self.$info)[0].lastChild.nodeValue = "Add Image";
+                    self.$infoName.text(self.strings.placeholder);
                 } else {
                     img_name = image.match(/([\S]+[\/])([\S]+\w+$)/i)[2];
-                    $(self.$info)[0].lastChild.nodeValue = img_name;
+                    self.$infoName.text(img_name);
                 }
             },
             _update: function() {
@@ -190,11 +207,12 @@
                 init: function() {
                     var that = this;
 
-                    var tpl_content = self.options.repeat.tpl().replace(/namespace/g, self.namespace);
+                    var tpl_content = self.options.repeat.tpl().replace(/\{\{namespace\}\}/g, self.namespace)
+                        .replace(/\{\{strings.bgRepeat\}\}/g, self.strings.bgRepeat);
                     this.$tpl_repeat = $(tpl_content);
                     self.$image_wrap.after(this.$tpl_repeat);
 
-                    this.$repeat = self.$extend.find('.' + self.namespace + '-repeat');
+                    this.$repeat = self.$expand.find('.' + self.namespace + '-repeat');
                     this.$items = this.$repeat.find('li');
 
                     $.each(this.values, function(key, value) {
@@ -249,11 +267,12 @@
                 init: function() {
                     var that = this;
 
-                    var tpl_content = self.options.position.tpl().replace(/namespace/g, self.namespace);
+                    var tpl_content = self.options.position.tpl().replace(/\{\{namespace\}\}/g, self.namespace)
+                        .replace(/\{\{strings.bgPosition\}\}/g, self.strings.bgPosition);
                     this.$tpl_position = $(tpl_content);
                     self.$image_wrap.after(this.$tpl_position);
 
-                    this.$position = self.$extend.find('.' + self.namespace + '-position');
+                    this.$position = self.$expand.find('.' + self.namespace + '-position');
                     this.$items = this.$position.find('li');
 
                     $.each(this.values, function(key, value) {
@@ -309,11 +328,12 @@
                 init: function() {
                     var that = this;
 
-                    var tpl_content = self.options.size.tpl().replace(/namespace/g, self.namespace);
+                    var tpl_content = self.options.size.tpl().replace(/\{\{namespace\}\}/g, self.namespace)
+                        .replace(/\{\{strings.bgSize\}\}/g, self.strings.bgSize);
                     this.$tpl_size = $(tpl_content);
                     self.$image_wrap.after(this.$tpl_size);
 
-                    this.$size = self.$extend.find('.' + self.namespace + '-size');
+                    this.$size = self.$expand.find('.' + self.namespace + '-size');
                     this.$items = this.$size.find('li');
 
                     $.each(this.values, function(key, value) {
@@ -367,13 +387,15 @@
                 default_value: self.options.attachment.default_value,
                 init: function() {
                     var that = this;
-                    var tpl_content = self.options.attachment.tpl().replace(/otherNamespace/g, self.options.attachment.namespace).replace(/namespace/g, self.namespace);
+                    var tpl_content = self.options.attachment.tpl().replace(/\{\{attachNamespace\}\}/g, self.options.attachment.namespace)
+                        .replace(/\{\{namespace\}\}/g, self.namespace)
+                        .replace(/\{\{strings.bgAttach\}\}/g, self.strings.bgAttach);
                     this.$tpl_attachment = $(tpl_content);
                     self.$image_wrap.after(this.$tpl_attachment);
 
-                    this.$attachment = self.$extend.find('.' + self.namespace + '-attachment');
+                    this.$attachment = self.$expand.find('.' + self.namespace + '-attachment');
                     this.$items = this.$attachment.find('li');
-                    this.$dropdown = self.$extend.find('.' + self.options.attachment.namespace);
+                    this.$dropdown = self.$expand.find('.' + self.options.attachment.namespace);
                     this.values = self.options.attachment.values;
 
                     $.each(this.values, function(key, value) {
@@ -560,13 +582,14 @@
         namespace: pluginName,
         skin: null,
         image: "images\/defaults.png", // "..\/xxxx\/images\/xxxx.png"
+        lang: 'en',
         repeat: {
             default_value: 'repeat',
             values: ["no-repeat", "repeat", "repeat-x", "repeat-y"],
             tpl: function() {
-                return '<div class="namespace-repeat">' +
-                    '<span class="namespace-repeat-title">Repeat</span>' +
-                    '<ul class="namespace-repeat-content">' +
+                return '<div class="{{namespace}}-repeat">' +
+                    '<span class="{{namespace}}-repeat-title">{{strings.bgRepeat}}</span>' +
+                    '<ul class="{{namespace}}-repeat-content">' +
                     '<li class="repeat_no-repeat"></li>' +
                     '<li class="repeat_repeat"></li>' +
                     '<li class="repeat_repeat-x"></li>' +
@@ -579,9 +602,9 @@
             default_value: 'top left',
             values: ["top left", "top center", "top right", "center left", "center center", "center right", "bottom left", "bottom center", "bottom right"],
             tpl: function() {
-                return '<div class="namespace-position">' +
-                    '<span class="namespace-position-title">Position</span>' +
-                    '<ul class="namespace-position-content">' +
+                return '<div class="{{namespace}}-position">' +
+                    '<span class="{{namespace}}-position-title">{{strings.bgPosition}}</span>' +
+                    '<ul class="{{namespace}}-position-content">' +
                     '<li class="postion_top-left"></li>' +
                     '<li class="postion_top-center"></li>' +
                     '<li class="postion_top-right"></li>' +
@@ -599,9 +622,9 @@
             default_value: 'auto',
             values: ["auto", "cover", "contain", "100% 100%"],
             tpl: function() {
-                return '<div class="namespace-size">' +
-                    '<span class="namespace-size-title">Scalling</span>' +
-                    '<ul class="namespace-size-content">' +
+                return '<div class="{{namespace}}-size">' +
+                    '<span class="{{namespace}}-size-title">{{strings.bgSize}}</span>' +
+                    '<ul class="{{namespace}}-size-content">' +
                     '<li class="size_adapt-auto"></li>' +
                     '<li class="size_adapt-width"></li>' +
                     '<li class="size_adapt-height"></li>' +
@@ -615,10 +638,10 @@
             default_value: 'scroll',
             values: ["scroll", "fixed", "inherit"],
             tpl: function() {
-                return '<div class="namespace-attachment">' +
-                    '<span class="namespace-attachment-title">Attach</span>' +
-                    '<div class="namespace-attachment-content">' +
-                    '<div class="otherNamespace namespace-dropdown-trigger"><i class="asIcon-caret-down"></i></div>' +
+                return '<div class="{{namespace}}-attachment">' +
+                    '<span class="{{namespace}}-attachment-title">{{strings.bgAttach}}</span>' +
+                    '<div class="{{namespace}}-attachment-content">' +
+                    '<div class="{{attachNamespace}} {{namespace}}-dropdown-trigger"><i class="asIcon-caret-down"></i></div>' +
                     '<ul>' +
                     '<li class="attachment_scroll">scroll</li>' +
                     '<li class="attachment_fixed">fixed</li>' +
@@ -630,21 +653,21 @@
         },
 
         tpl: function() {
-            return '<div class="' + this.namespace + '">' +
-                '<div class="' + this.namespace + '-initiate">' +
-                '<div class="' + this.namespace + '-image-info"><span></span>Add Image</div>' +
-                '<div class="' + this.namespace + '-actions">Change</div>' +
-                '<a class="' + this.namespace + '-remove" href=""></a>' +
+            return '<div class="{{namespace}}">' +
+                '<div class="{{namespace}}-initiate">' +
+                '<i></i>{{strings.placeholder}}' +
                 '</div>' +
-                '</div>';
-        },
-
-        tpl_extend: function() {
-            return '<div class="' + this.namespace + '-extend">' +
-                '<a class="' + this.namespace + '-close" href="#"></a>' +
-                '<div class="' + this.namespace + '-image-wrap">' +
-                '<div class="' + this.namespace + '-image"></div>' +
+                '<div class="{{namespace}}-info">' +
+                '<i></i><span class="{{namespace}}-info-name">{{strings.placeholder}}</span>' +
+                '<div class="{{namespace}}-info-change">{{strings.change}}</div>' +
+                '<a class="{{namespace}}-info-remove" href=""></a>' +
                 '</div>' +
+                '<div class="{{namespace}}-expand">' +
+                '<a class="{{namespace}}-expand-close" href="#"></a>' +
+                '<div class="{{namespace}}-expand-image-wrap">' +
+                '<div class="{{namespace}}-expand-image"></div>' +
+                '</div>' +
+                '</div>'; +
                 '</div>';
         },
 
@@ -682,8 +705,24 @@
             }
         },
         select: function() {},
-        onChange: function() {}
+        onChange: function() {},
+        strings: {}
     };
+
+    Plugin.Strings = {};
+
+    Plugin.localize = function(lang, label) {
+        Plugin.Strings[lang] = label;
+    };
+
+    Plugin.localize('en', {
+        placeholder: 'Add Image',
+        change: 'change',
+        bgRepeat: 'Repeat',
+        bgPosition: 'Position',
+        bgAttach: 'Attach',
+        bgSize: 'Scalling'
+    });
 
     $.fn[pluginName] = function(options) {
         if (typeof options === 'string') {
