@@ -568,6 +568,10 @@
             this._update();
         },
 
+        get: function() {
+            return this.options.process(this.value);
+        },
+
         enable: function() {
             this.disabled = false;
             this.$wrap.removeClass(this.classes.disabled);

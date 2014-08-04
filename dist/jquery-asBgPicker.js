@@ -1,4 +1,4 @@
-/*! jQuery asBgPicker - v0.1.1 - 2014-07-24
+/*! jQuery asBgPicker - v0.1.1 - 2014-08-04
 * https://github.com/amazingSurge/jquery-asBgPicker
 * Copyright (c) 2014 amazingSurge; Licensed GPL */
 (function($, document, window, undefined) {
@@ -561,6 +561,10 @@
         setAttachment: function(attachment) {
             this.doAttachment.set(attachment);
             this._update();
+        },
+
+        get: function() {
+            return this.options.process(this.value);
         },
 
         enable: function() {
