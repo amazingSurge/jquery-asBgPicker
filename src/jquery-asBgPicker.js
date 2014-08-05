@@ -131,14 +131,6 @@
                     return false;
                 });
 
-                this.$element.on('onChange', function() {
-                    if (self.disabled) {
-                        return;
-                    }
-
-                    self.options.onChange.call(self);
-                });
-
                 this.$image.on('click', function() {
                     if (self.disabled) {
                         return;
@@ -569,7 +561,7 @@
         },
 
         get: function() {
-            return this.options.process(this.value);
+            return this.value;
         },
 
         enable: function() {

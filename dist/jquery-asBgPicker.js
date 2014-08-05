@@ -1,4 +1,4 @@
-/*! jQuery asBgPicker - v0.1.1 - 2014-08-04
+/*! jQuery asBgPicker - v0.1.1 - 2014-08-05
 * https://github.com/amazingSurge/jquery-asBgPicker
 * Copyright (c) 2014 amazingSurge; Licensed GPL */
 (function($, document, window, undefined) {
@@ -124,14 +124,6 @@
 
                     self.$wrap.addClass(self.classes.exist).removeClass(self.classes.expand);
                     return false;
-                });
-
-                this.$element.on('onChange', function() {
-                    if (self.disabled) {
-                        return;
-                    }
-
-                    self.options.onChange.call(self);
                 });
 
                 this.$image.on('click', function() {
@@ -564,7 +556,7 @@
         },
 
         get: function() {
-            return this.options.process(this.value);
+            return this.value;
         },
 
         enable: function() {
