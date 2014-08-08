@@ -61,9 +61,7 @@
                     this.disable();
                 }
                 // init
-                if (this.value.image) {
-                    this.setImage(this.value.image);
-                } else {
+                if (!this.value.image) {
                     this.$wrap.addClass(this.classes.empty);
                 }
 
@@ -112,7 +110,7 @@
                     self.$wrap.addClass(self.classes.expand).removeClass(self.classes.exist);
                 });
 
-                this.$remove.on("click", function(e) {
+                this.$remove.on("click", function() {
                     if (self.disabled) {
                         return;
                     }
@@ -465,12 +463,9 @@
         set: function(value, update) {
             this.value = value;
 
+            this.setImage(value.image);
+
             if (update !== false) {
-                if (typeof value.image !== 'undefined') {
-                    this.setImage(value.image);
-                } else {
-                    this.setImage('');
-                }
                 if (typeof value.repeat !== 'undefined') {
                     this.doRepeat.set(value.repeat);
                 } else {
@@ -514,19 +509,18 @@
         setImage: function(image) {
             var thumbnailUrl,
                 self = this;
-            self._setState(image);
-            self._returnInfo(image);
+            this._setState(image);
+            this._returnInfo(image);
             if (image === '' || typeof image === 'undefined') {
-                self.$image.css({
+                this.$image.css({
                     "background-image": 'none'
                 });
-            } else if (image || image !== self.options.image) {
-                thumbnailUrl = self.options.getThumbnalil(image);
+            } else if (image || image !== this.options.image) {
+                thumbnailUrl = this.options.getThumbnalil(image);
                 var img = new Image();
                 img.onload = function() {
                     self.value.image = thumbnailUrl;
                     self._returnInfo(self.value.image);
-                    self._update();
                     self.$image.css({
                         "background-image": 'url("' + self.value.image + '")'
                     });
@@ -670,7 +664,7 @@
                 '<div class="{{namespace}}-expand-image-wrap">' +
                 '<div class="{{namespace}}-expand-image"></div>' +
                 '</div>' +
-                '</div>'; +
+                '</div>' +
                 '</div>';
         },
 
