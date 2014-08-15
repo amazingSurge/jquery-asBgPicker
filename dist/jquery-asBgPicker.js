@@ -151,17 +151,17 @@
                 this.$image = $('.' + this.namespace + '-expand-image', this.$expand);
             },
 
-            _trigger: function(eventType, data) {
+            _trigger: function(eventType) {
+                var method_arguments = arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : undefined;
                 // event
-                self.$element.trigger('asBgPicker::' + eventType, data, self);
-                self.$element.trigger(eventType + '.asBgPicker', data, self);
+                self.$element.trigger('asBgPicker::' + eventType, method_arguments, self);
+                self.$element.trigger(eventType + '.asBgPicker', method_arguments, self);
 
                 // callback
                 eventType = eventType.replace(/\b\w+\b/g, function(word) {
                     return word.substring(0, 1).toUpperCase() + word.substring(1);
                 });
                 var onFunction = 'on' + eventType;
-                var method_arguments = arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : undefined;
                 if (typeof self.options[onFunction] === 'function') {
                     self.options[onFunction].apply(self, method_arguments);
                 }
@@ -188,7 +188,7 @@
                 }
 
                 self.$element.val(self.val());
-                self._trigger('change', [self.options.parse(self.val()), self.options.name, pluginName]);
+                self._trigger('change', self.options.parse(self.val()), self.options.name, pluginName);
             },
 
             doRepeat: {
