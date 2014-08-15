@@ -1,4 +1,4 @@
-/*! jQuery asBgPicker - v0.1.1 - 2014-08-08
+/*! jQuery asBgPicker - v0.1.1 - 2014-08-15
 * https://github.com/amazingSurge/jquery-asBgPicker
 * Copyright (c) 2014 amazingSurge; Licensed GPL */
 (function($, document, window, undefined) {
@@ -151,10 +151,10 @@
                 this.$image = $('.' + this.namespace + '-expand-image', this.$expand);
             },
 
-            _trigger: function(eventType) {
+            _trigger: function(eventType, data) {
                 // event
-                self.$element.trigger('asBgPicker::' + eventType, self);
-                self.$element.trigger(eventType + '.asBgPicker', self);
+                self.$element.trigger('asBgPicker::' + eventType, data, self);
+                self.$element.trigger(eventType + '.asBgPicker', data, self);
 
                 // callback
                 eventType = eventType.replace(/\b\w+\b/g, function(word) {
@@ -188,7 +188,7 @@
                 }
 
                 self.$element.val(self.val());
-                self._trigger('change', self.val());
+                self._trigger('change', [self.options.parse(self.val()), self.options.name, pluginName]);
             },
 
             doRepeat: {
