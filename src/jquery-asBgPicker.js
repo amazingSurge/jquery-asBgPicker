@@ -157,16 +157,18 @@
             },
 
             _trigger: function(eventType) {
-                var method_arguments = arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : undefined;
+                var data = arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : undefined;
+                data ? data.push(self) : data = self;
                 // event
-                self.$element.trigger('asBgPicker::' + eventType, method_arguments, self);
-                self.$element.trigger(eventType + '.asBgPicker', method_arguments, self);
+                self.$element.trigger('asBgPicker::' + eventType, data);
+                self.$element.trigger(eventType + '.asBgPicker', data);
 
                 // callback
                 eventType = eventType.replace(/\b\w+\b/g, function(word) {
                     return word.substring(0, 1).toUpperCase() + word.substring(1);
                 });
                 var onFunction = 'on' + eventType;
+                var method_arguments = arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : undefined;
                 if (typeof self.options[onFunction] === 'function') {
                     self.options[onFunction].apply(self, method_arguments);
                 }
