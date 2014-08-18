@@ -157,8 +157,14 @@
             },
 
             _trigger: function(eventType) {
-                var data = arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : undefined;
-                data ? data.push(self) : data = self;
+                var method_arguments = arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : undefined,
+                    data;
+                if (method_arguments) {
+                    data = method_arguments;
+                    data.push(self);
+                } else {
+                    data = self;
+                }
                 // event
                 self.$element.trigger('asBgPicker::' + eventType, data);
                 self.$element.trigger(eventType + '.asBgPicker', data);
@@ -168,7 +174,6 @@
                     return word.substring(0, 1).toUpperCase() + word.substring(1);
                 });
                 var onFunction = 'on' + eventType;
-                var method_arguments = arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : undefined;
                 if (typeof self.options[onFunction] === 'function') {
                     self.options[onFunction].apply(self, method_arguments);
                 }
