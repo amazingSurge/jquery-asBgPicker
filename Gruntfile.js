@@ -110,20 +110,28 @@ module.exports = function(grunt) {
                 }]
             },
         },
-        // -- recess config -------------------------------------------------------
-        recess: {
+        // -- less config ----------------------------------------------------------
+        less: {
             dist: {
-                options: {
-                    compile: true
-                },
                 files: {
                     'demo/css/asBgPicker.css': ['less/asBgPicker.less']
                 }
             }
         },
+
+        // -- autoprefixer config ----------------------------------------------------------
+        autoprefixer: {
+            options: {
+                browsers: ['last 2 versions', 'ie 8', 'ie 9', 'android 2.3', 'android 4', 'opera 12']
+            },
+            src: {
+                expand: true,
+                cwd: 'demo/css/',
+                src: ['asBgPicker.css'],
+                dest: 'demo/css/'
+            }
+        }
     });
-
-
 
     // -- Main Tasks ---------------------------------------------------------------
     // These plugins provide necessary tasks.
@@ -135,11 +143,12 @@ module.exports = function(grunt) {
     grunt.registerTask('default', ['js', 'dist', 'css']);
 
     grunt.registerTask('dist', ['clean', 'concat', 'uglify']);
-    grunt.registerTask('css', ['recess']);
+
+    grunt.registerTask('js', ['jshint', 'jsbeautifier']);
+    grunt.registerTask('css', ['less', 'autoprefixer']);
+
     grunt.registerTask('version', [
         'replace:bower',
         'replace:jquery'
     ]);
-    grunt.registerTask('js', ['jshint', 'jsbeautifier']);
-
 };

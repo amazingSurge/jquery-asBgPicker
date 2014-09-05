@@ -29,8 +29,9 @@
     "grunt-contrib-clean": "*",
     "grunt-jsbeautifier": "*",
     "grunt-text-replace": "*",
+    "grunt-autoprefixer": "*",
     "grunt": "~0.4.5",
-    "grunt-recess": "*",
+    "grunt-contrib-less": "*",
     "load-grunt-tasks": "*"
   },
   "keywords": []

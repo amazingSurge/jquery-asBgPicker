@@ -5,7 +5,6 @@
  * Copyright (c) 2014 amazingSurge
  * Licensed under the GPL license.
  */
-
 (function($, document, window, undefined) {
     "use strict";
 
@@ -731,11 +730,11 @@
     $.fn[pluginName] = function(options) {
         if (typeof options === 'string') {
             var method = options;
-            var method_arguments = arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : undefined;
+            var method_arguments = arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : [];
 
             if (/^\_/.test(method)) {
                 return false;
-            } else if (method === 'val' && method_arguments === undefined) {
+            } else if (method === 'val' && method_arguments === []) {
                 var api = this.first().data(pluginName);
                 if (api && typeof api[method] === 'function') {
                     return api[method].apply(api, method_arguments);
