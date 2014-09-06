@@ -157,13 +157,8 @@
 
             _trigger: function(eventType) {
                 var method_arguments = Array.prototype.slice.call(arguments, 1),
-                    data;
-                if (method_arguments) {
-                    data = method_arguments;
-                    data.push(self);
-                } else {
-                    data = self;
-                }
+                    data = method_arguments.concat([self]);
+
                 // event
                 self.$element.trigger('asBgPicker::' + eventType, data);
                 self.$element.trigger(eventType + '.asBgPicker', data);
