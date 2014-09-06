@@ -153,11 +153,10 @@
 
             _trigger: function(eventType) {
                 var method_arguments = Array.prototype.slice.call(arguments, 1),
-                    data = method_arguments.concat([self]);
+                    data = [self].concat(method_arguments);
 
                 // event
                 self.$element.trigger('asBgPicker::' + eventType, data);
-                self.$element.trigger(eventType + '.asBgPicker', data);
 
                 // callback
                 eventType = eventType.replace(/\b\w+\b/g, function(word) {
