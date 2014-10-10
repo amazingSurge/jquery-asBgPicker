@@ -39,6 +39,7 @@
             expand: this.namespace + '_expand'
         };
 
+        this.$element.addClass(this.namespace + '-input');
         // flag
         this.disabled = false;
         this.initialed = false;
