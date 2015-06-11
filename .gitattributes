@@ -19,3 +19,4 @@
 demo/* linguist-documentation
 libs/* linguist-vendored
 fonts/* linguist-vendored
+less/* linguist-vendored
