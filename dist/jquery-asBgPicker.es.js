@@ -1,12 +1,147 @@
-/*
- * asBgPicker
- * https://github.com/amazingSurge/jquery-asBgPicker
- *
- * Copyright (c) 2014 amazingSurge
- * Licensed under the GPL license.
- */
-import $ from 'jQuery';
-import defaults from './defaults';
+/**
+* jQuery asBgPicker
+* a jquery plugin
+* Compiled: Tue Aug 16 2016 16:30:47 GMT+0800 (CST)
+* @version v0.1.1
+* @link https://github.com/amazingSurge/jquery-asBgPicker
+* @copyright LGPL-3.0
+*/
+import $$1 from 'jQuery';
+
+var defaults = {
+  namespace: '',
+  skin: null,
+  image: 'images/defaults.png', // "..\/xxxx\/images\/xxxx.png"
+  lang: 'en',
+  repeat: {
+    defaultValue: 'repeat',
+    values: ['no-repeat', 'repeat', 'repeat-x', 'repeat-y'],
+    tpl() {
+      'use strict';
+      return '<div class="{{namespace}}-repeat">' +
+        '<span class="{{namespace}}-repeat-title">{{strings.bgRepeat}}</span>' +
+        '<ul class="{{namespace}}-repeat-content">' +
+        '<li class="repeat_no-repeat"></li>' +
+        '<li class="repeat_repeat"></li>' +
+        '<li class="repeat_repeat-x"></li>' +
+        '<li class="repeat_repeat-y"></li>' +
+        '</ul>' +
+        '</div>';
+    }
+  },
+  position: {
+    defaultValue: 'top left',
+    values: ['top left', 'top center', 'top right', 'center left', 'center center', 'center right', 'bottom left', 'bottom center', 'bottom right'],
+    tpl() {
+      'use strict';
+      return '<div class="{{namespace}}-position">' +
+        '<span class="{{namespace}}-position-title">{{strings.bgPosition}}</span>' +
+        '<ul class="{{namespace}}-position-content">' +
+        '<li class="postion_top-left"></li>' +
+        '<li class="postion_top-center"></li>' +
+        '<li class="postion_top-right"></li>' +
+        '<li class="postion_center-left"></li>' +
+        '<li class="postion_center-center"></li>' +
+        '<li class="postion_center-right"></li>' +
+        '<li class="postion_bottom-left"></li>' +
+        '<li class="postion_bottom-center"></li>' +
+        '<li class="postion_bottom-right"></li>' +
+        '</ul>' +
+        '</div>';
+    }
+  },
+  size: {
+    defaultValue: 'auto',
+    values: ['auto', 'cover', 'contain', '100% 100%'],
+    tpl() {
+      'use strict';
+      return '<div class="{{namespace}}-size">' +
+        '<span class="{{namespace}}-size-title">{{strings.bgSize}}</span>' +
+        '<ul class="{{namespace}}-size-content">' +
+        '<li class="size_adapt-auto"></li>' +
+        '<li class="size_adapt-width"></li>' +
+        '<li class="size_adapt-height"></li>' +
+        '<li class="size_adapt-all"></li>' +
+        '</ul>' +
+        '</div>';
+    }
+  },
+  attachment: {
+    namespace: 'asDropdown',
+    defaultValue: 'scroll',
+    values: ['scroll', 'fixed', 'inherit'],
+    tpl() {
+      'use strict';
+      return '<div class="{{namespace}}-attachment">' +
+        '<span class="{{namespace}}-attachment-title">{{strings.bgAttach}}</span>' +
+        '<div class="{{namespace}}-attachment-content">' +
+        '<div class="{{attachNamespace}} {{namespace}}-dropdown-trigger"><i class="asIcon-caret-down"></i></div>' +
+        '<ul>' +
+        '<li class="attachment_scroll">scroll</li>' +
+        '<li class="attachment_fixed">fixed</li>' +
+        '<li class="attachment_default">default</li>' +
+        '</ul>' +
+        '</div>' +
+        '</div>';
+    }
+  },
+
+  tpl() {
+    'use strict';
+    return '<div class="{{namespace}}">' +
+      '<div class="{{namespace}}-initiate">' +
+      '<i></i>{{strings.placeholder}}' +
+      '</div>' +
+      '<div class="{{namespace}}-info">' +
+      '<div class="{{namespace}}-info-image">' +
+      '<i></i><span class="{{namespace}}-info-image-name">{{strings.placeholder}}</span>' +
+      '</div>' +
+      '<div class="{{namespace}}-info-change">{{strings.change}}</div>' +
+      '<a class="{{namespace}}-info-remove" href=""></a>' +
+      '</div>' +
+      '<div class="{{namespace}}-expand">' +
+      '<a class="{{namespace}}-expand-close" href="#"></a>' +
+      '<div class="{{namespace}}-expand-image-wrap">' +
+      '<div class="{{namespace}}-expand-image"></div>' +
+      '</div>' +
+      '</div>' +
+      '</div>';
+  },
+
+  process(value) {
+    'use strict';
+    if (value && typeof value.image !== 'undefined' && value.image !== '') {
+      return JSON.stringify(value);
+    }
+    return '';
+  },
+
+  parse(value) {
+    'use strict';
+    if (value) {
+      return $.parseJSON(value);
+    }
+    return {};
+  },
+
+  getThumbnalil(image) {
+    'use strict';
+    let imageData, imageFormat, imageName, imagePath;
+
+    imageData = image.match(/([\S]+[\/])([\S]+)(\.+\w+$)/i);
+    imagePath = imageData[1];
+    imageName = imageData[2];
+    imageFormat = imageData[3];
+
+    if (imageName.search('thumbnail') === 0) {
+      return imagePath + imageName + imageFormat;
+    }
+    return `${imagePath}thumbnail-${imageName}${imageFormat}`;
+  },
+  select() {},
+  onChange() {},
+  strings: {}
+};
 
 const pluginName = 'asBgPicker';
 
@@ -16,9 +151,9 @@ defaults.namespace = pluginName;
 class asBgPicker {
   constructor(element, options) {
     this.element = element;
-    this.$element = $(element);
+    this.$element = $$1(element);
 
-    this.options = $.extend({}, defaults, options, this.$element.data());
+    this.options = $$1.extend({}, defaults, options, this.$element.data());
 
     // load lang strings
     if (typeof asBgPicker.Strings[this.options.lang] === 'undefined') {
@@ -26,7 +161,7 @@ class asBgPicker {
     } else {
       this.lang = this.options.lang;
     }
-    this.strings = $.extend({}, asBgPicker.Strings[this.lang], this.options.strings);
+    this.strings = $$1.extend({}, asBgPicker.Strings[this.lang], this.options.strings);
 
     this.namespace = this.options.namespace;
 
@@ -48,7 +183,7 @@ class asBgPicker {
     this.initialed = false;
 
     const self = this;
-    $.extend(self, {
+    $$1.extend(self, {
       init() {
         this._createHtml();
 
@@ -96,13 +231,13 @@ class asBgPicker {
             return;
           }
 
-          $(this).addClass(self.classes.hover);
+          $$1(this).addClass(self.classes.hover);
         }).on('mouseleave', function() {
           if (self.disabled) {
             return;
           }
 
-          $(this).removeClass(self.classes.hover);
+          $$1(this).removeClass(self.classes.hover);
         });
 
         this.$change.on('click', () => {
@@ -141,22 +276,22 @@ class asBgPicker {
         });
       },
       _createHtml() {
-        this.$wrap = $(this.options.tpl().replace(/\{\{namespace\}\}/g, this.namespace)
+        this.$wrap = $$1(this.options.tpl().replace(/\{\{namespace\}\}/g, this.namespace)
           .replace(/\{\{strings.placeholder\}\}/g, this.strings.placeholder)
           .replace(/\{\{strings.change\}\}/g, this.strings.change));
         this.$element.after(this.$wrap);
 
-        this.$initiate = $(`.${this.namespace}-initiate`, this.$wrap);
+        this.$initiate = $$1(`.${this.namespace}-initiate`, this.$wrap);
 
-        this.$info = $(`.${this.namespace}-info`, this.$wrap);
-        this.$infoImageName = $(`.${this.namespace}-info-image-name`, this.$info);
-        this.$remove = $(`.${this.namespace}-info-remove`, this.$info);
-        this.$change = $(`.${this.namespace}-info-change`, this.$info);
+        this.$info = $$1(`.${this.namespace}-info`, this.$wrap);
+        this.$infoImageName = $$1(`.${this.namespace}-info-image-name`, this.$info);
+        this.$remove = $$1(`.${this.namespace}-info-remove`, this.$info);
+        this.$change = $$1(`.${this.namespace}-info-change`, this.$info);
 
-        this.$expand = $(`.${this.namespace}-expand`, this.$wrap);
-        this.$close = $(`.${this.namespace}-expand-close`, this.$expand);
-        this.$imageWrap = $(`.${this.namespace}-expand-image-wrap`, this.$expand);
-        this.$image = $(`.${this.namespace}-expand-image`, this.$expand);
+        this.$expand = $$1(`.${this.namespace}-expand`, this.$wrap);
+        this.$close = $$1(`.${this.namespace}-expand-close`, this.$expand);
+        this.$imageWrap = $$1(`.${this.namespace}-expand-image-wrap`, this.$expand);
+        this.$image = $$1(`.${this.namespace}-expand-image`, this.$expand);
       },
 
       _trigger(eventType,...params) {
@@ -204,13 +339,13 @@ class asBgPicker {
 
           const tplContent = self.options.repeat.tpl().replace(/\{\{namespace\}\}/g, self.namespace)
             .replace(/\{\{strings.bgRepeat\}\}/g, self.strings.bgRepeat);
-          this.$tplRepeat = $(tplContent);
+          this.$tplRepeat = $$1(tplContent);
           self.$imageWrap.after(this.$tplRepeat);
 
           this.$repeat = self.$expand.find(`.${self.namespace}-repeat`);
           this.$items = this.$repeat.find('li');
 
-          $.each(this.values, (key, value) => {
+          $$1.each(this.values, (key, value) => {
             that.$items.eq(key).data('repeat', value);
           });
 
@@ -248,7 +383,7 @@ class asBgPicker {
             if (self.disabled) {
               return;
             }
-            const value = $(this).data('repeat');
+            const value = $$1(this).data('repeat');
             that.set(value);
             self._update();
             return false;
@@ -264,13 +399,13 @@ class asBgPicker {
 
           const tplContent = self.options.position.tpl().replace(/\{\{namespace\}\}/g, self.namespace)
             .replace(/\{\{strings.bgPosition\}\}/g, self.strings.bgPosition);
-          this.$tplPosition = $(tplContent);
+          this.$tplPosition = $$1(tplContent);
           self.$imageWrap.after(this.$tplPosition);
 
           this.$position = self.$expand.find(`.${self.namespace}-position`);
           this.$items = this.$position.find('li');
 
-          $.each(this.values, (key, value) => {
+          $$1.each(this.values, (key, value) => {
             that.$items.eq(key).data('position', value);
           });
 
@@ -309,7 +444,7 @@ class asBgPicker {
             if (self.disabled) {
               return;
             }
-            const value = $(this).data('position');
+            const value = $$1(this).data('position');
             that.set(value);
             self._update();
             return false;
@@ -325,13 +460,13 @@ class asBgPicker {
 
           const tplContent = self.options.size.tpl().replace(/\{\{namespace\}\}/g, self.namespace)
             .replace(/\{\{strings.bgSize\}\}/g, self.strings.bgSize);
-          this.$tplSize = $(tplContent);
+          this.$tplSize = $$1(tplContent);
           self.$imageWrap.after(this.$tplSize);
 
           this.$size = self.$expand.find(`.${self.namespace}-size`);
           this.$items = this.$size.find('li');
 
-          $.each(this.values, (key, value) => {
+          $$1.each(this.values, (key, value) => {
             that.$items.eq(key).data('size', value);
           });
 
@@ -368,7 +503,7 @@ class asBgPicker {
             if (self.disabled) {
               return;
             }
-            const value = $(this).data('size');
+            const value = $$1(this).data('size');
             that.set(value);
             self._update();
             return false;
@@ -383,7 +518,7 @@ class asBgPicker {
           const tplContent = self.options.attachment.tpl().replace(/\{\{attachNamespace\}\}/g, self.options.attachment.namespace)
             .replace(/\{\{namespace\}\}/g, self.namespace)
             .replace(/\{\{strings.bgAttach\}\}/g, self.strings.bgAttach);
-          this.$tplAttachment = $(tplContent);
+          this.$tplAttachment = $$1(tplContent);
           self.$imageWrap.after(this.$tplAttachment);
 
           this.$attachment = self.$expand.find(`.${self.namespace}-attachment`);
@@ -391,7 +526,7 @@ class asBgPicker {
           this.$dropdown = self.$expand.find(`.${self.options.attachment.namespace}`);
           this.values = self.options.attachment.values;
 
-          $.each(this.values, (key, value) => {
+          $$1.each(this.values, (key, value) => {
             that.$items.eq(key).data('attachment', value);
           });
 
@@ -579,7 +714,7 @@ static _jQueryInterface(options, ...params) {
         }
       } else {
         return this.each(function() {
-          let api = $.data(this, pluginName);
+          let api = $$1.data(this, pluginName);
           if (api && typeof api[options] === 'function') {
             api[options](...params);
           }
@@ -587,8 +722,8 @@ static _jQueryInterface(options, ...params) {
       }
     }
     return this.each(function() {
-      if (!$.data(this, pluginName)) {
-        $.data(this, pluginName, new asBgPicker(this, options));
+      if (!$$1.data(this, pluginName)) {
+        $$1.data(this, pluginName, new asBgPicker(this, options));
       }
     });
 
@@ -612,11 +747,11 @@ asBgPicker.localize('en', {
   bgSize: 'Scalling'
 });
 
-$.fn[pluginName] = asBgPicker._jQueryInterface;
-$.fn[pluginName].constructor = asBgPicker;
-$.fn[pluginName].noConflict = function() {
+$$1.fn[pluginName] = asBgPicker._jQueryInterface;
+$$1.fn[pluginName].constructor = asBgPicker;
+$$1.fn[pluginName].noConflict = function() {
   'use strict';
-  $.fn[pluginName] = JQUERY_NO_CONFLICT;
+  $$1.fn[pluginName] = JQUERY_NO_CONFLICT;
   return asBgPicker._jQueryInterface;
 };
 

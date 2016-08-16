@@ -1,0 +1,558 @@
+/**
+* jQuery asBgPicker
+* a jquery plugin
+* Compiled: Tue Aug 16 2016 16:30:47 GMT+0800 (CST)
+* @version v0.1.1
+* @link https://github.com/amazingSurge/jquery-asBgPicker
+* @copyright LGPL-3.0
+*/
+@font-face {
+  font-family: "asFont";
+  src: url("../fonts/asFont.eot");
+  src: url("../fonts/asFont.eot") format("embedded-opentype"), url("../fonts/asFont.woff") format("woff"), url("../fonts/asFont.ttf") format("truetype"), url("../fonts/asFont.svg") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="asIcon-"], [class*=" asIcon-"] {
+  font-family: "asFont";
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  line-height: 1;
+  text-transform: none;
+  speak: none;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+}
+
+.asIcon-search::before {
+  content: "\e600";
+}
+
+.asIcon-chevron-right::before {
+  content: "\e601";
+}
+
+.asIcon-chevron-left::before {
+  content: "\e602";
+}
+
+.asIcon-check::before {
+  content: "\e603";
+}
+
+.asIcon-caret-down::before {
+  content: "\e604";
+}
+
+.asIcon-calendar::before {
+  content: "\e606";
+}
+
+.asIcon-caret-up::before {
+  content: "\e605";
+}
+
+.asIcon-text_left::before {
+  content: "\e608";
+}
+
+.asIcon-text_center::before {
+  content: "\e609";
+}
+
+.asIcon-text_right::before {
+  content: "\e60a";
+}
+
+.asIcon-unsorted::before {
+  content: "\e607";
+}
+
+.asIcon-text_lowercase::before {
+  content: "\e60d";
+}
+
+.asIcon-font_italy::before {
+  content: "\e60b";
+}
+
+.asIcon-text_uppercase::before {
+  content: "\e60c";
+}
+
+.asIcon-text_underline::before {
+  content: "\e60e";
+}
+
+.asIcon-text_linethrough::before {
+  content: "\e610";
+}
+
+.asIcon-text_capitalize::before {
+  content: "\e60f";
+}
+
+.asIcon-angle-up::before {
+  content: "\e611";
+}
+
+.asIcon-angle-down::before {
+  content: "\e612";
+}
+
+.asIcon-no-repeat::before {
+  content: "\e613";
+}
+
+.asIcon-repeat::before {
+  content: "\e614";
+}
+
+.asIcon-repeat-y::before {
+  content: "\e616";
+}
+
+.asIcon-repeat-x::before {
+  content: "\e615";
+}
+
+.asIcon-bg-top-left::before {
+  content: "\e617";
+}
+
+.asIcon-bg-top-center::before {
+  content: "\e618";
+}
+
+.asIcon-bg-top-right::before {
+  content: "\e619";
+}
+
+.asIcon-bg-center-left::before {
+  content: "\e61a";
+}
+
+.asIcon-bg-center-center::before {
+  content: "\e61b";
+}
+
+.asIcon-bg-center-right::before {
+  content: "\e61c";
+}
+
+.asIcon-bg-bottom-left::before {
+  content: "\e61d";
+}
+
+.asIcon-bg-bottom-center::before {
+  content: "\e61e";
+}
+
+.asIcon-bg-bottom-right::before {
+  content: "\e61f";
+}
+
+.asIcon-adapt-height::before {
+  content: "\e620";
+}
+
+.asIcon-adapt-width::before {
+  content: "\e621";
+}
+
+.asIcon-adapt-auto::before {
+  content: "\e622";
+}
+
+.asIcon-adapt-all::before {
+  content: "\e623";
+}
+
+.asIcon-image::before {
+  content: "\e624";
+}
+
+.asIcon-file::before {
+  content: "\e625";
+}
+
+.asIcon-minus::before {
+  content: "\e626";
+}
+
+.asIcon-times::before {
+  content: "\e627";
+}
+
+.asBgPicker {
+  display: inline-block;
+}
+.asBgPicker-initiate, .asBgPicker-info {
+  position: relative;
+  display: block;
+  width: 199px;
+  padding: 15px 20px;
+  line-height: 26px;
+  color: #687175;
+  text-align: center;
+  background-color: #ffffff;
+}
+.asBgPicker-initiate-image > i, .asBgPicker-info-image > i {
+  margin-right: 10px;
+  font-family: "asFont";
+  font-size: 31px;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  line-height: 1;
+  color: #dbdbdb;
+  text-transform: none;
+  vertical-align: top;
+  -moz-osx-font-smoothing: grayscale;
+  speak: none;
+  -webkit-font-smoothing: antialiased;
+}
+.asBgPicker-initiate-image > i::before, .asBgPicker-info-image > i::before {
+  content: "\e624";
+}
+.asBgPicker-initiate {
+  cursor: pointer;
+  border: 2px dashed #e5e5e5;
+}
+.asBgPicker-info {
+  border: 2px solid #e5e5e5;
+}
+.asBgPicker-info-change {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  display: none;
+  width: 100%;
+  height: 100%;
+  font-size: 16px;
+  line-height: 56px;
+  color: #ffffff;
+  text-align: center;
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, .8);
+  border: 2px solid #dbdbdb;
+}
+.asBgPicker-info-remove {
+  position: absolute;
+  top: -9px;
+  right: -9px;
+  display: none;
+  width: 16px;
+  height: 16px;
+  font-family: "asFont";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  line-height: 18px;
+  color: #ffffff;
+  text-align: center;
+  text-decoration: none;
+  text-transform: none;
+  background-color: #ff7975;
+  border: 2px solid #ffffff;
+  border-radius: 50px;
+  -moz-osx-font-smoothing: grayscale;
+  speak: none;
+  -webkit-font-smoothing: antialiased;
+}
+.asBgPicker-info-remove::before {
+  margin-top: 0;
+  content: "\e627";
+}
+.asBgPicker-info-remove:hover {
+  text-decoration: none;
+}
+.asBgPicker-expand {
+  position: relative;
+  -webkit-box-sizing: border-box;
+     box-sizing: border-box;
+  width: 310px;
+  padding: 30px 20px;
+  background-color: #f4f6f7;
+}
+.asBgPicker-expand .asDropdown-wrapper {
+  width: 192px;
+  margin-right: 2px;
+}
+.asBgPicker-expand > div {
+  margin-bottom: 20px;
+}
+.asBgPicker-expand > div:last-child {
+  margin-bottom: 0;
+}
+.asBgPicker-expand-image-wrap {
+  display: block;
+  width: 266px;
+  height: 156px;
+  margin-bottom: 20px;
+  background: url("../../demo/images/bg-canvas.png") no-repeat center;
+  border: 2px solid #dbddde;
+}
+.asBgPicker-expand-image {
+  width: 100%;
+  height: 100%;
+}
+.asBgPicker-expand-close {
+  position: absolute;
+  top: -9px;
+  right: -9px;
+  width: 16px;
+  height: 16px;
+  font-size: 14px;
+  line-height: 16px;
+  color: #ffffff;
+  text-decoration: none;
+  background-color: #ff7975;
+  border: 2px solid #ffffff;
+  border-radius: 50px;
+}
+.asBgPicker-expand-close::before {
+  margin-top: 0;
+  content: "\e626";
+}
+.asBgPicker-expand-close:hover {
+  text-decoration: none;
+}
+.asBgPicker-position, .asBgPicker-repeat, .asBgPicker-size {
+  overflow: hidden;
+}
+.asBgPicker-position-content, .asBgPicker-repeat-content, .asBgPicker-size-content {
+  overflow: hidden;
+}
+.asBgPicker-attachment::before, .asBgPicker-attachment::after {
+  display: table;
+  content: "";
+}
+.asBgPicker-attachment::after {
+  clear: both;
+}
+.asBgPicker-position-title, .asBgPicker-repeat-title, .asBgPicker-attachment-title, .asBgPicker-size-title {
+  float: left;
+  margin-top: 5px;
+  font-size: 12px;
+  color: #6e7a8a;
+}
+.asBgPicker-position-content, .asBgPicker-repeat-content, .asBgPicker-attachment-content, .asBgPicker-size-content {
+  float: right;
+  width: 192px;
+  padding: 0;
+  margin: 0;
+  font-size: 20px;
+  color: #8f9196;
+  list-style: none;
+}
+.asBgPicker-repeat-content li, .asBgPicker-position-content li, .asBgPicker-size-content li, .asBgPicker-expand-close {
+  font-family: "asFont";
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  line-height: 1;
+  text-align: center;
+  text-transform: none;
+  speak: none;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+}
+.asBgPicker-repeat-content li, .asBgPicker-size-content li {
+  position: relative;
+  z-index: 1;
+  float: left;
+  width: 46px;
+  height: 30px;
+  padding: 0;
+  margin: 0 0 0 -2px;
+  line-height: 33px;
+  background-color: #e5e8ea;
+  border-right: 2px solid rgba(255, 255, 255, .4);
+  border-left: 2px solid rgba(255, 255, 255, .4);
+}
+.asBgPicker-repeat-content li:last-child, .asBgPicker-size-content li:last-child {
+  border-right: 0;
+  border-right: none;
+}
+.asBgPicker-position-content {
+  position: relative;
+  height: 124px;
+}
+.asBgPicker-position-content::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 9;
+  width: 2px;
+  height: 124px;
+  content: "";
+  background: #f4f6f7;
+}
+.asBgPicker-position-content li {
+  position: relative;
+  z-index: 1;
+  float: left;
+  width: 62px;
+  height: 40px;
+  padding: 0;
+  margin: -2px 0 0 -2px;
+  line-height: 40px;
+  background-color: #e5e8ea;
+  border: 2px solid rgba(255, 255, 255, .4);
+}
+.asBgPicker_active {
+  z-index: 9 !important;
+  color: #ffffff !important;
+  background-color: #5cafda !important;
+  border-color: #5cafda !important;
+}
+.asBgPicker .repeat_no-repeat::before {
+  content: "\e613";
+}
+.asBgPicker .repeat_repeat::before {
+  content: "\e614";
+}
+.asBgPicker .repeat_repeat-x::before {
+  content: "\e615";
+}
+.asBgPicker .repeat_repeat-y::before {
+  content: "\e616";
+}
+.asBgPicker .postion_top-left::before {
+  content: "\e617";
+}
+.asBgPicker .postion_top-center::before {
+  content: "\e618";
+}
+.asBgPicker .postion_top-right::before {
+  content: "\e619";
+}
+.asBgPicker .postion_center-left::before {
+  content: "\e61a";
+}
+.asBgPicker .postion_center-center::before {
+  content: "\e61b";
+}
+.asBgPicker .postion_center-right::before {
+  content: "\e61c";
+}
+.asBgPicker .postion_bottom-left::before {
+  content: "\e61d";
+}
+.asBgPicker .postion_bottom-center::before {
+  content: "\e61e";
+}
+.asBgPicker .postion_bottom-right::before {
+  content: "\e61f";
+}
+.asBgPicker .size_adapt-height::before {
+  content: "\e620";
+}
+.asBgPicker .size_adapt-width::before {
+  content: "\e621";
+}
+.asBgPicker .size_adapt-auto::before {
+  content: "\e622";
+}
+.asBgPicker .size_adapt-all::before {
+  content: "\e623";
+}
+.asBgPicker .asDropdown-wrapper {
+  position: relative;
+}
+.asBgPicker .asDropdown-trigger {
+  position: relative;
+  height: 32px;
+  padding: 0 10px;
+  font-size: 14px;
+  line-height: 32px;
+  color: #bbbbbb;
+  text-transform: capitalize;
+  background-color: #ffffff;
+  border: 2px solid #e4e4e4;
+}
+.asBgPicker .asDropdown-trigger::before, .asBgPicker .asDropdown-trigger::after {
+  display: table;
+  content: "\20";
+}
+.asBgPicker .asDropdown-trigger::after {
+  clear: both;
+}
+.asBgPicker .asDropdown-trigger:hover {
+  border-color: #bbbbbb;
+}
+.asBgPicker .asDropdown-trigger i {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 20px;
+}
+.asBgPicker .asDropdown-panel {
+  position: absolute;
+  z-index: 99;
+  -webkit-box-sizing: border-box;
+     box-sizing: border-box;
+  display: none;
+  width: inherit;
+  padding: 3px 2px;
+  margin: 5px 0;
+  background-color: #ffffff;
+  border: 2px solid #e4e4e4;
+}
+.asBgPicker .asDropdown-panel li {
+  display: block;
+  padding: 4px 6px;
+  margin: 0;
+  font-size: 14px;
+  color: #777777;
+  text-transform: capitalize;
+  list-style: none;
+  background-color: #ffffff;
+}
+.asBgPicker .asDropdown-panel li:hover {
+  color: #ffffff;
+  background-color: #41a9e5;
+}
+.asBgPicker .asDropdown-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+}
+.asBgPicker .asDropdown-panel.asDropdown_show {
+  display: block;
+}
+
+.asBgPicker_exist .asBgPicker-info {
+  display: block !important;
+}
+
+.asBgPicker_exist .asBgPicker-initiate, .asBgPicker_exist .asBgPicker-expand {
+  display: none !important;
+}
+
+.asBgPicker_empty .asBgPicker-initiate {
+  display: block !important;
+}
+
+.asBgPicker_empty .asBgPicker-info, .asBgPicker_empty .asBgPicker-expand {
+  display: none !important;
+}
+
+.asBgPicker_expand .asBgPicker-expand {
+  display: block !important;
+}
+
+.asBgPicker_expand .asBgPicker-initiate, .asBgPicker_expand .asBgPicker-info {
+  display: none !important;
+}
+
+.asBgPicker_hover .asBgPicker-info-change, .asBgPicker_hover .asBgPicker-info-remove {
+  display: block !important;
+}

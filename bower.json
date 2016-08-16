@@ -1,22 +1,29 @@
 {
   "name": "jquery-asBgPicker",
   "version": "0.1.0",
-  "homepage": "https://github.com/amazingSurge/jquery-asBgPicker",
-  "author": {
-    "name": "amazingSurge",
-    "email": "amazingSurge@yahoo.com",
-    "url": "amazingSurge.com"
-  },
-  "license": "GPL",
+  "main": "dist/jquery-asBgPicker.js",
+  "copyright": "amazingSurge",
+  "license": "LGPL-3.0",
   "ignore": [
     "**/.*",
     "node_modules",
     "bower_components",
     "test",
+    "demo",
+    "libs",
+    "package.json",
+    "gulpfile.babel.js",
     "tests"
   ],
+  "homepage": "https://github.com/amazingSurge/jquery-asBgPicker",
+  "authors": [
+    "amazingSurge <amazingSurge@gmail.com>"
+  ],
+  "moduleType": [
+    "globals"
+  ],
   "dependencies": {
-    "jquery-asDropdown": "git@github.com:amazingSurge/jquery-asDropdown.git",
-    "jquery": ">=1.8.3"
+    "jquery": ">=2.1.1",
+    "jquery-asDropdown": "git@github.com:amazingSurge/jquery-asDropdown.git"
   }
 }
