@@ -12,7 +12,7 @@ var defaults = {
   namespace: '',
   skin: null,
   image: 'images/defaults.png', // "..\/xxxx\/images\/xxxx.png"
-  lang: 'en',
+  lang: 'en',Material Theme
   repeat: {
     defaultValue: 'repeat',
     values: ['no-repeat', 'repeat', 'repeat-x', 'repeat-y'],
