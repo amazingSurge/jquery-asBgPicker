@@ -1,17 +1,17 @@
 /**
-* jQuery asBgPicker
-* a jquery plugin
-* Compiled: Tue Aug 16 2016 16:30:47 GMT+0800 (CST)
-* @version v0.1.1
-* @link https://github.com/amazingSurge/jquery-asBgPicker
-* @copyright LGPL-3.0
+* jQuery asBgPicker v0.1.2
+* https://github.com/amazingSurge/jquery-asBgPicker
+*
+* Copyright (c) amazingSurge
+* Released under the LGPL-3.0 license
 */
 @font-face {
   font-family: "asFont";
+  font-style: normal; 
+  font-weight: normal;
+
   src: url("../fonts/asFont.eot");
   src: url("../fonts/asFont.eot") format("embedded-opentype"), url("../fonts/asFont.woff") format("woff"), url("../fonts/asFont.ttf") format("truetype"), url("../fonts/asFont.svg") format("svg");
-  font-weight: normal;
-  font-style: normal;
 }
 
 [class^="asIcon-"], [class*=" asIcon-"] {
@@ -21,6 +21,7 @@
   font-variant: normal;
   line-height: 1;
   text-transform: none;
+
   speak: none;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
@@ -197,7 +198,7 @@
   line-height: 26px;
   color: #687175;
   text-align: center;
-  background-color: #ffffff;
+  background-color: #fff;
 }
 .asBgPicker-initiate-image > i, .asBgPicker-info-image > i {
   margin-right: 10px;
@@ -210,6 +211,7 @@
   color: #dbdbdb;
   text-transform: none;
   vertical-align: top;
+
   -moz-osx-font-smoothing: grayscale;
   speak: none;
   -webkit-font-smoothing: antialiased;
@@ -233,7 +235,7 @@
   height: 100%;
   font-size: 16px;
   line-height: 56px;
-  color: #ffffff;
+  color: #fff;
   text-align: center;
   cursor: pointer;
   background-color: rgba(0, 0, 0, .8);
@@ -252,13 +254,14 @@
   font-weight: normal;
   font-variant: normal;
   line-height: 18px;
-  color: #ffffff;
+  color: #fff;
   text-align: center;
   text-decoration: none;
   text-transform: none;
   background-color: #ff7975;
-  border: 2px solid #ffffff;
+  border: 2px solid #fff;
   border-radius: 50px;
+
   -moz-osx-font-smoothing: grayscale;
   speak: none;
   -webkit-font-smoothing: antialiased;
@@ -273,7 +276,7 @@
 .asBgPicker-expand {
   position: relative;
   -webkit-box-sizing: border-box;
-     box-sizing: border-box;
+  box-sizing: border-box;
   width: 310px;
   padding: 30px 20px;
   background-color: #f4f6f7;
@@ -308,10 +311,10 @@
   height: 16px;
   font-size: 14px;
   line-height: 16px;
-  color: #ffffff;
+  color: #fff;
   text-decoration: none;
   background-color: #ff7975;
-  border: 2px solid #ffffff;
+  border: 2px solid #fff;
   border-radius: 50px;
 }
 .asBgPicker-expand-close::before {
@@ -357,6 +360,7 @@
   line-height: 1;
   text-align: center;
   text-transform: none;
+
   speak: none;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
@@ -406,7 +410,7 @@
 }
 .asBgPicker_active {
   z-index: 9 !important;
-  color: #ffffff !important;
+  color: #fff !important;
   background-color: #5cafda !important;
   border-color: #5cafda !important;
 }
@@ -470,9 +474,9 @@
   padding: 0 10px;
   font-size: 14px;
   line-height: 32px;
-  color: #bbbbbb;
+  color: #bbb;
   text-transform: capitalize;
-  background-color: #ffffff;
+  background-color: #fff;
   border: 2px solid #e4e4e4;
 }
 .asBgPicker .asDropdown-trigger::before, .asBgPicker .asDropdown-trigger::after {
@@ -483,7 +487,7 @@
   clear: both;
 }
 .asBgPicker .asDropdown-trigger:hover {
-  border-color: #bbbbbb;
+  border-color: #bbb;
 }
 .asBgPicker .asDropdown-trigger i {
   position: absolute;
@@ -495,12 +499,12 @@
   position: absolute;
   z-index: 99;
   -webkit-box-sizing: border-box;
-     box-sizing: border-box;
+  box-sizing: border-box;
   display: none;
   width: inherit;
   padding: 3px 2px;
   margin: 5px 0;
-  background-color: #ffffff;
+  background-color: #fff;
   border: 2px solid #e4e4e4;
 }
 .asBgPicker .asDropdown-panel li {
@@ -508,13 +512,13 @@
   padding: 4px 6px;
   margin: 0;
   font-size: 14px;
-  color: #777777;
+  color: #777;
   text-transform: capitalize;
   list-style: none;
-  background-color: #ffffff;
+  background-color: #fff;
 }
 .asBgPicker .asDropdown-panel li:hover {
-  color: #ffffff;
+  color: #fff;
   background-color: #41a9e5;
 }
 .asBgPicker .asDropdown-mask {

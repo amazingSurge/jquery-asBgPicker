@@ -1,24 +1,34 @@
 {
   "name": "jquery-asBgPicker",
   "title": "jQuery asBgPicker",
-  "description": "a jquery plugin",
-  "version": "0.1.1",
+  "description": "A jquery plugin that do amazing things.",
+  "version": "0.1.2",
   "homepage": "https://github.com/amazingSurge/jquery-asBgPicker",
   "author": {
     "name": "amazingSurge",
-    "email": "amazingsurge@gmail.com",
+    "email": "amazingSurge@gmail.com",
     "url": "amazingSurge.com"
   },
   "repository": {
     "type": "git",
     "url": "git@github.com:amazingSurge/jquery-asBgPicker.git"
   },
+  "keywords": [
+    "jquery",
+    "jquery-plugin",
+    "ecosystem:jquery",
+    "ui",
+    "es6"
+  ],
   "bugs": "https://github.com/amazingSurge/jquery-asBgPicker/issues",
-  "licenses": [{
-    "type": "LGPL-3.0",
-    "url": "https://github.com/amazingSurge/jquery-asBgPicker/blob/master/LICENSE"
-  }],
+  "licenses": [
+    {
+      "type": "LGPL-3.0",
+      "url": "https://github.com/amazingSurge/jquery-asBgPicker/blob/master/LICENSE"
+    }
+  ],
   "license": "LGPL-3.0",
+  "main": "dist/jquery-asBgPicker.js",
   "files": [
     "dist",
     "src"
@@ -29,14 +39,16 @@
     "build": "npm run prestart && gulp build",
     "deploy": "gulp deploy",
     "deploy:prepare": "gulp deploy:prepare",
+    "release": "gulp release",
     "test": "gulp test"
   },
   "devDependencies": {
     "argv": "*",
+    "assets-manager": "*",
     "babel-core": "*",
     "babel-eslint": "*",
     "babel-istanbul": "*",
-    "babel-plugin-transform-es2015-modules-umd": "^6.12.0",
+    "babel-plugin-transform-es2015-modules-umd": "*",
     "babel-preset-es2015": "*",
     "babel-preset-es2015-rollup": "*",
     "babelrc-rollup": "*",
@@ -91,8 +103,10 @@
     "mkdirp": "*",
     "mocha": "*",
     "node-notifier": "*",
+    "normalize.css": "^4.2.0",
     "path-exists": "*",
     "phantomjs-prebuilt": "*",
+    "release-it": "*",
     "rollup-plugin-babel": "*",
     "rollup-plugin-istanbul": "*",
     "sinon": "*",
@@ -104,5 +118,8 @@
   "engines": {
     "node": ">= 6.2.2",
     "npm": ">= 3"
+  },
+  "dependencies": {
+    "jquery": ">=2.2.0"
   }
 }

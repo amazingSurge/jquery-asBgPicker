@@ -1,13 +1,14 @@
+/* eslint no-empty-function: "off" */
+
 export default {
-  namespace: '',
+  namespace: 'asBgPicker',
   skin: null,
-  image: 'images/defaults.png', // "..\/xxxx\/images\/xxxx.png"
+  image: 'images/defaults.png',
   lang: 'en',
   repeat: {
     defaultValue: 'repeat',
     values: ['no-repeat', 'repeat', 'repeat-x', 'repeat-y'],
-    tpl() {
-      'use strict';
+    tpl: function() {
       return '<div class="{{namespace}}-repeat">' +
         '<span class="{{namespace}}-repeat-title">{{strings.bgRepeat}}</span>' +
         '<ul class="{{namespace}}-repeat-content">' +
@@ -19,11 +20,11 @@ export default {
         '</div>';
     }
   },
+
   position: {
     defaultValue: 'top left',
     values: ['top left', 'top center', 'top right', 'center left', 'center center', 'center right', 'bottom left', 'bottom center', 'bottom right'],
-    tpl() {
-      'use strict';
+    tpl: function() {
       return '<div class="{{namespace}}-position">' +
         '<span class="{{namespace}}-position-title">{{strings.bgPosition}}</span>' +
         '<ul class="{{namespace}}-position-content">' +
@@ -40,11 +41,11 @@ export default {
         '</div>';
     }
   },
+
   size: {
     defaultValue: 'auto',
     values: ['auto', 'cover', 'contain', '100% 100%'],
-    tpl() {
-      'use strict';
+    tpl: function() {
       return '<div class="{{namespace}}-size">' +
         '<span class="{{namespace}}-size-title">{{strings.bgSize}}</span>' +
         '<ul class="{{namespace}}-size-content">' +
@@ -56,12 +57,12 @@ export default {
         '</div>';
     }
   },
+
   attachment: {
     namespace: 'asDropdown',
     defaultValue: 'scroll',
     values: ['scroll', 'fixed', 'inherit'],
-    tpl() {
-      'use strict';
+    tpl: function() {
       return '<div class="{{namespace}}-attachment">' +
         '<span class="{{namespace}}-attachment-title">{{strings.bgAttach}}</span>' +
         '<div class="{{namespace}}-attachment-content">' +
@@ -76,8 +77,7 @@ export default {
     }
   },
 
-  tpl() {
-    'use strict';
+  tpl: function() {
     return '<div class="{{namespace}}">' +
       '<div class="{{namespace}}-initiate">' +
       '<i></i>{{strings.placeholder}}' +
@@ -98,7 +98,7 @@ export default {
       '</div>';
   },
 
-  process(value) {
+  process: function(value) {
     'use strict';
     if (value && typeof value.image !== 'undefined' && value.image !== '') {
       return JSON.stringify(value);
@@ -106,7 +106,7 @@ export default {
     return '';
   },
 
-  parse(value) {
+  parse: function(value) {
     'use strict';
     if (value) {
       return $.parseJSON(value);
@@ -114,7 +114,7 @@ export default {
     return {};
   },
 
-  getThumbnalil(image) {
+  getThumbnalil: function(image) {
     'use strict';
     let imageData, imageFormat, imageName, imagePath;
 
@@ -128,7 +128,6 @@ export default {
     }
     return `${imagePath}thumbnail-${imageName}${imageFormat}`;
   },
-  select() {},
-  onChange() {},
-  strings: {}
+  select: function() {},
+  onChange: function() {}
 };

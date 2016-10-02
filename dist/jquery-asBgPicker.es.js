@@ -1,23 +1,23 @@
 /**
-* jQuery asBgPicker
-* a jquery plugin
-* Compiled: Tue Aug 16 2016 16:30:47 GMT+0800 (CST)
-* @version v0.1.1
-* @link https://github.com/amazingSurge/jquery-asBgPicker
-* @copyright LGPL-3.0
+* jQuery asBgPicker v0.1.2
+* https://github.com/amazingSurge/jquery-asBgPicker
+*
+* Copyright (c) amazingSurge
+* Released under the LGPL-3.0 license
 */
-import $$1 from 'jQuery';
+import $$1 from 'jquery';
 
-var defaults = {
-  namespace: '',
+/* eslint no-empty-function: "off" */
+
+var DEFAULTS = {
+  namespace: 'asBgPicker',
   skin: null,
-  image: 'images/defaults.png', // "..\/xxxx\/images\/xxxx.png"
-  lang: 'en',Material Theme
+  image: 'images/defaults.png',
+  lang: 'en',
   repeat: {
     defaultValue: 'repeat',
     values: ['no-repeat', 'repeat', 'repeat-x', 'repeat-y'],
-    tpl() {
-      'use strict';
+    tpl: function() {
       return '<div class="{{namespace}}-repeat">' +
         '<span class="{{namespace}}-repeat-title">{{strings.bgRepeat}}</span>' +
         '<ul class="{{namespace}}-repeat-content">' +
@@ -29,11 +29,11 @@ var defaults = {
         '</div>';
     }
   },
+
   position: {
     defaultValue: 'top left',
     values: ['top left', 'top center', 'top right', 'center left', 'center center', 'center right', 'bottom left', 'bottom center', 'bottom right'],
-    tpl() {
-      'use strict';
+    tpl: function() {
       return '<div class="{{namespace}}-position">' +
         '<span class="{{namespace}}-position-title">{{strings.bgPosition}}</span>' +
         '<ul class="{{namespace}}-position-content">' +
@@ -50,11 +50,11 @@ var defaults = {
         '</div>';
     }
   },
+
   size: {
     defaultValue: 'auto',
     values: ['auto', 'cover', 'contain', '100% 100%'],
-    tpl() {
-      'use strict';
+    tpl: function() {
       return '<div class="{{namespace}}-size">' +
         '<span class="{{namespace}}-size-title">{{strings.bgSize}}</span>' +
         '<ul class="{{namespace}}-size-content">' +
@@ -66,12 +66,12 @@ var defaults = {
         '</div>';
     }
   },
+
   attachment: {
     namespace: 'asDropdown',
     defaultValue: 'scroll',
     values: ['scroll', 'fixed', 'inherit'],
-    tpl() {
-      'use strict';
+    tpl: function() {
       return '<div class="{{namespace}}-attachment">' +
         '<span class="{{namespace}}-attachment-title">{{strings.bgAttach}}</span>' +
         '<div class="{{namespace}}-attachment-content">' +
@@ -86,8 +86,7 @@ var defaults = {
     }
   },
 
-  tpl() {
-    'use strict';
+  tpl: function() {
     return '<div class="{{namespace}}">' +
       '<div class="{{namespace}}-initiate">' +
       '<i></i>{{strings.placeholder}}' +
@@ -108,7 +107,7 @@ var defaults = {
       '</div>';
   },
 
-  process(value) {
+  process: function(value) {
     'use strict';
     if (value && typeof value.image !== 'undefined' && value.image !== '') {
       return JSON.stringify(value);
@@ -116,7 +115,7 @@ var defaults = {
     return '';
   },
 
-  parse(value) {
+  parse: function(value) {
     'use strict';
     if (value) {
       return $.parseJSON(value);
@@ -124,7 +123,7 @@ var defaults = {
     return {};
   },
 
-  getThumbnalil(image) {
+  getThumbnalil: function(image) {
     'use strict';
     let imageData, imageFormat, imageName, imagePath;
 
@@ -138,14 +137,284 @@ var defaults = {
     }
     return `${imagePath}thumbnail-${imageName}${imageFormat}`;
   },
-  select() {},
-  onChange() {},
-  strings: {}
+  select: function() {},
+  onChange: function() {}
 };
 
-const pluginName = 'asBgPicker';
+var STRINGS = {
+  en: {
+    placeholder: 'Add Image',
+    change: 'change',
+    bgRepeat: 'Repeat',
+    bgPosition: 'Position',
+    bgAttach: 'Attach',
+    bgSize: 'Scalling'
+  }
+};
 
-defaults.namespace = pluginName;
+class Repeat {
+  constructor(instance) {
+    this.instance = instance;
+    this.values = instance.options.repeat.values;
+    this.defaultValue = instance.options.repeat.defaultValue;
+
+    this.init();
+  }
+
+  init() {
+    const tplContent = this.instance.options.repeat.tpl().replace(/\{\{namespace\}\}/g, this.instance.namespace)
+      .replace(/\{\{strings.bgRepeat\}\}/g, this.instance.strings.bgRepeat);
+    this.$tplRepeat = $(tplContent);
+    this.instance.$imageWrap.after(this.$tplRepeat);
+
+    this.$repeat = this.instance.$expand.find(`.${this.instance.namespace}-repeat`);
+    this.$items = this.$repeat.find('li');
+
+    $.each(this.values, (key, value) => {
+      this.$items.eq(key).data('repeat', value);
+    });
+
+    const value = typeof this.instance.value.repeat !== 'undefined' ? this.instance.value.repeat : this.defaultValue;
+    this.set(value);
+
+    this.bindEvent();
+  }
+
+  set(value) {
+    let found = false;
+    this.$items.removeClass(this.instance.classes.active);
+    for (let i = 0; i < this.values.length; i++) {
+      if (value === this.values[i]) {
+        this.instance.value.repeat = value;
+        this.$items.eq(i).addClass(this.instance.classes.active);
+        this.instance.$image.css({
+          'background-repeat': value
+        });
+        found = true;
+      }
+    }
+    if (!found) {
+      this.set(this.defaultValue);
+    }
+  }
+
+  clear() {
+    this.set(this.defaultValue);
+  }
+
+  bindEvent() {
+    const that = this;
+    this.$repeat.on('click', 'li', function() {
+      if (that.instance.disabled) {
+        return;
+      }
+      const value = $(this).data('repeat');
+      that.set(value);
+      that.instance._update();
+      return false;
+    });
+  }
+}
+
+class Size {
+  constructor(instance) {
+    this.instance = instance;
+    this.values = instance.options.size.values;
+    this.defaultValue = instance.options.size.defaultValue;
+
+    this.init();
+  }
+
+  init() {
+    const tplContent = this.instance.options.size.tpl().replace(/\{\{namespace\}\}/g, this.instance.namespace)
+      .replace(/\{\{strings.bgSize\}\}/g, this.instance.strings.bgSize);
+    this.$tplSize = $(tplContent);
+    this.instance.$imageWrap.after(this.$tplSize);
+
+    this.$size = this.instance.$expand.find(`.${this.instance.namespace}-size`);
+    this.$items = this.$size.find('li');
+
+    $.each(this.values, (key, value) => {
+      this.$items.eq(key).data('size', value);
+    });
+
+    const value = typeof this.instance.value.size !== 'undefined' ? this.instance.value.size : this.defaultValue;
+    this.set(value);
+
+    this.bindEvent();
+  }
+
+  set(value) {
+    let found = false;
+    this.$items.removeClass(this.instance.classes.active);
+    for (let i = 0; i < this.values.length; i++) {
+      if (value === this.values[i]) {
+        this.instance.value.size = value;
+        this.$items.eq(i).addClass(this.instance.classes.active);
+        this.instance.$image.css({
+          'background-size': value
+        });
+        found = true;
+      }
+    }
+    if (!found) {
+      this.set(this.defaultValue);
+    }
+  }
+
+  clear() {
+    this.set(this.defaultValue);
+  }
+
+  bindEvent() {
+    const that = this;
+    this.$size.on('click', 'li', function() {
+      if (that.instance.disabled) {
+        return;
+      }
+      const value = $(this).data('size');
+      that.set(value);
+      that.instance._update();
+      return false;
+    });
+  }
+}
+
+class Position {
+  constructor(instance) {
+    this.instance = instance;
+    this.values = instance.options.position.values;
+    this.defaultValue = instance.options.position.defaultValue;
+
+    this.init();
+  }
+
+  init() {
+
+    const tplContent = this.instance.options.position.tpl().replace(/\{\{namespace\}\}/g, this.instance.namespace)
+      .replace(/\{\{strings.bgPosition\}\}/g, this.instance.strings.bgPosition);
+    this.$tplPosition = $(tplContent);
+    this.instance.$imageWrap.after(this.$tplPosition);
+
+    this.$position = this.instance.$expand.find(`.${this.instance.namespace}-position`);
+    this.$items = this.$position.find('li');
+
+    $.each(this.values, (key, value) => {
+      this.$items.eq(key).data('position', value);
+    });
+
+    const value = typeof this.instance.value.position !== 'undefined' ? this.instance.value.position : this.defaultValue;
+    this.set(value);
+
+    this.bindEvent();
+  }
+
+  set(value) {
+    let found = false;
+    this.$items.removeClass(this.instance.classes.active);
+    for (let i = 0; i < this.values.length; i++) {
+      if (value === this.values[i]) {
+        this.instance.value.position = value;
+        this.$items.eq(i).addClass(this.instance.classes.active);
+        this.instance.$image.css({
+          'background-position': value
+        });
+        found = true;
+      }
+    }
+
+    if (!found) {
+      this.set(this.defaultValue);
+    }
+  }
+
+  clear() {
+    this.set(this.defaultValue);
+  }
+
+  bindEvent() {
+    const that = this;
+    this.$position.on('click', 'li', function() {
+      if (that.instance.disabled) {
+        return;
+      }
+      const value = $(this).data('position');
+      that.set(value);
+      that.instance._update();
+      return false;
+    });
+  }
+}
+
+class Attachment {
+  constructor(instance) {
+    this.instance = instance;
+    this.values = instance.options.attachment.values;
+    this.defaultValue = instance.options.attachment.defaultValue;
+
+    this.init();
+  }
+
+  init() {
+    const tplContent = this.instance.options.attachment.tpl().replace(/\{\{attachNamespace\}\}/g, this.instance.options.attachment.namespace)
+      .replace(/\{\{namespace\}\}/g, this.instance.namespace)
+      .replace(/\{\{strings.bgAttach\}\}/g, this.instance.strings.bgAttach);
+    this.$tplAttachment = $(tplContent);
+    this.instance.$imageWrap.after(this.$tplAttachment);
+
+    this.$attachment = this.instance.$expand.find(`.${this.instance.namespace}-attachment`);
+    this.$items = this.$attachment.find('li');
+    this.$dropdown = this.instance.$expand.find(`.${this.instance.options.attachment.namespace}`);
+    this.values = this.instance.options.attachment.values;
+
+    $.each(this.values, (key, value) => {
+      this.$items.eq(key).data('attachment', value);
+    });
+
+    const that = this;
+
+    this.$dropdown.asDropdown({
+      namespace: this.instance.options.attachment.namespace,
+      imitateSelect: true,
+      data: 'attachment',
+      // select: this.instance.attachment,
+      onChange(value) {
+        if (that.instance.disabled) {
+          return;
+        }
+        that.instance.value.attachment = value;
+        that.instance._update();
+        that.instance.$image.css({
+          'background-attachment': that.instance.value.attachment
+        });
+      }
+    });
+
+    const value = typeof this.instance.value.attachment !== 'undefined' ? this.instance.value.attachment : this.defaultValue;
+    this.set(value);
+  }
+
+  set(value) {
+    let found = false;
+    this.$items.removeClass(this.instance.classes.active);
+    for (let i = 0; i < this.values.length; i++) {
+      if (value === this.values[i]) {
+        this.$dropdown.data('asDropdown').set(value);
+        found = true;
+      }
+    }
+
+    if (!found) {
+      this.set(this.defaultValue);
+    }
+  }
+
+  clear() {
+    this.set(this.defaultValue);
+  }
+}
+
+const NAMESPACE$1 = 'asBgPicker';
 
 // main constructor
 class asBgPicker {
@@ -153,15 +422,16 @@ class asBgPicker {
     this.element = element;
     this.$element = $$1(element);
 
-    this.options = $$1.extend({}, defaults, options, this.$element.data());
+    this.options = $$1.extend(true, {}, DEFAULTS, options, this.$element.data());
 
     // load lang strings
-    if (typeof asBgPicker.Strings[this.options.lang] === 'undefined') {
+    if (typeof STRINGS[this.options.lang] === 'undefined') {
       this.lang = 'en';
     } else {
       this.lang = this.options.lang;
     }
-    this.strings = $$1.extend({}, asBgPicker.Strings[this.lang], this.options.strings);
+
+    this.strings = STRINGS[this.lang];
 
     this.namespace = this.options.namespace;
 
@@ -182,398 +452,161 @@ class asBgPicker {
     this.disabled = false;
     this.initialed = false;
 
-    const self = this;
-    $$1.extend(self, {
-      init() {
-        this._createHtml();
+    this._trigger('init');
+    this._init();
+  }
 
-        if (this.options.skin) {
-          this.$wrap.addClass(this.classes.skin);
-        }
+  _init() {
+    this._createHtml();
 
-        this.value = this.options.parse(this.$element.val());
+    if (this.options.skin) {
+      this.$wrap.addClass(this.classes.skin);
+    }
 
-        this.set(this.value, false);
+    this.value = this.options.parse(this.$element.val());
 
-        if (this.options.disabled) {
-          this.disable();
-        }
-        // init
-        if (!this.value.image) {
-          this.$wrap.addClass(this.classes.empty);
-        }
+    this.set(this.value, false);
 
-        this.doSize.init();
-        this.doAttachment.init();
-        this.doPosition.init();
-        this.doRepeat.init();
+    if (this.options.disabled) {
+      this.disable();
+    }
+    // init
+    if (!this.value.image) {
+      this.$wrap.addClass(this.classes.empty);
+    }
 
-        this.$wrap.addClass(this.classes.exist);
+    this.size = new Size(this);
+    this.attachment = new Attachment(this);
+    this.position = new Position(this);
+    this.repeat = new Repeat(this);
 
-        this._bindEvent();
+    this.$wrap.addClass(this.classes.exist);
 
-        this.initialed = true;
-        // after init end trigger 'ready'
-        this._trigger('ready');
-      },
+    this._bindEvent();
 
-      _bindEvent() {
-        this.$initiate.on('click', () => {
-          if (self.disabled) {
-            return;
-          }
+    this.initialed = true;
+    // after init end trigger 'ready'
+    this._trigger('ready');
+  }
 
-          self.$wrap.addClass(self.classes.expand).removeClass(self.classes.exist);
-        });
-
-        this.$info.on('mouseenter', function() {
-          if (self.disabled) {
-            return;
-          }
-
-          $$1(this).addClass(self.classes.hover);
-        }).on('mouseleave', function() {
-          if (self.disabled) {
-            return;
-          }
-
-          $$1(this).removeClass(self.classes.hover);
-        });
-
-        this.$change.on('click', () => {
-          if (self.disabled) {
-            return;
-          }
-
-          self.$wrap.addClass(self.classes.expand).removeClass(self.classes.exist);
-        });
-
-        this.$remove.on('click', () => {
-          if (self.disabled) {
-            return;
-          }
-
-          self.clear();
-
-          return false;
-        });
-
-        this.$close.on('click', () => {
-          if (self.disabled) {
-            return;
-          }
-
-          self.$wrap.addClass(self.classes.exist).removeClass(self.classes.expand);
-          return false;
-        });
-
-        this.$image.on('click', () => {
-          if (self.disabled) {
-            return;
-          }
-
-          self.options.select.call(self);
-        });
-      },
-      _createHtml() {
-        this.$wrap = $$1(this.options.tpl().replace(/\{\{namespace\}\}/g, this.namespace)
-          .replace(/\{\{strings.placeholder\}\}/g, this.strings.placeholder)
-          .replace(/\{\{strings.change\}\}/g, this.strings.change));
-        this.$element.after(this.$wrap);
-
-        this.$initiate = $$1(`.${this.namespace}-initiate`, this.$wrap);
-
-        this.$info = $$1(`.${this.namespace}-info`, this.$wrap);
-        this.$infoImageName = $$1(`.${this.namespace}-info-image-name`, this.$info);
-        this.$remove = $$1(`.${this.namespace}-info-remove`, this.$info);
-        this.$change = $$1(`.${this.namespace}-info-change`, this.$info);
-
-        this.$expand = $$1(`.${this.namespace}-expand`, this.$wrap);
-        this.$close = $$1(`.${this.namespace}-expand-close`, this.$expand);
-        this.$imageWrap = $$1(`.${this.namespace}-expand-image-wrap`, this.$expand);
-        this.$image = $$1(`.${this.namespace}-expand-image`, this.$expand);
-      },
-
-      _trigger(eventType,...params) {
-        const data = [self].concat(params);
-
-        // event
-        self.$element.trigger(`asBgPicker::${eventType}`, data);
-
-        // callback
-        eventType = eventType.replace(/\b\w+\b/g, word => word.substring(0, 1).toUpperCase() + word.substring(1));
-        const onFunction = `on${eventType}`;
-        if (typeof self.options[onFunction] === 'function') {
-          self.options[onFunction](...params);
-        }
-      },
-      _setState(image) {
-        if (!image || image === self.options.image) {
-          self.$wrap.addClass(self.classes.empty);
-        } else {
-          self.$wrap.removeClass(self.classes.empty);
-        }
-      },
-      _returnInfo(image) {
-        let imgName;
-        if (!image || image === self.options.image) {
-          self.$infoImageName.text(self.strings.placeholder);
-        } else {
-          imgName = image.match(/([\S]+[\/])([\S]+\w+$)/i)[2];
-          self.$infoImageName.text(imgName);
-        }
-      },
-      _update() {
-        if (self.value === null) {
-          self.value = {};
-        }
-
-        self.$element.val(self.val());
-        self._trigger('change', self.options.parse(self.val()), self.options.name, pluginName);
-      },
-      doRepeat: {
-        values: self.options.repeat.values,
-        defaultValue: self.options.repeat.defaultValue,
-        init() {
-          const that = this;
-
-          const tplContent = self.options.repeat.tpl().replace(/\{\{namespace\}\}/g, self.namespace)
-            .replace(/\{\{strings.bgRepeat\}\}/g, self.strings.bgRepeat);
-          this.$tplRepeat = $$1(tplContent);
-          self.$imageWrap.after(this.$tplRepeat);
-
-          this.$repeat = self.$expand.find(`.${self.namespace}-repeat`);
-          this.$items = this.$repeat.find('li');
-
-          $$1.each(this.values, (key, value) => {
-            that.$items.eq(key).data('repeat', value);
-          });
-
-          const value = typeof self.value.repeat !== 'undefined' ? self.value.repeat : this.defaultValue;
-          this.set(value);
-
-          this.bindEvent();
-        },
-
-        set(value) {
-          let found = false;
-          this.$items.removeClass(self.classes.active);
-          for (let i = 0; i < this.values.length; i++) {
-            if (value === this.values[i]) {
-              self.value.repeat = value;
-              this.$items.eq(i).addClass(self.classes.active);
-              self.$image.css({
-                'background-repeat': value
-              });
-              found = true;
-            }
-          }
-          if (!found) {
-            this.set(this.defaultValue);
-          }
-        },
-
-        clear() {
-          this.set(this.defaultValue);
-        },
-
-        bindEvent() {
-          const that = this;
-          this.$repeat.on('click', 'li', function() {
-            if (self.disabled) {
-              return;
-            }
-            const value = $$1(this).data('repeat');
-            that.set(value);
-            self._update();
-            return false;
-          });
-        }
-      },
-
-      doPosition: {
-        values: self.options.position.values,
-        defaultValue: self.options.position.defaultValue,
-        init() {
-          const that = this;
-
-          const tplContent = self.options.position.tpl().replace(/\{\{namespace\}\}/g, self.namespace)
-            .replace(/\{\{strings.bgPosition\}\}/g, self.strings.bgPosition);
-          this.$tplPosition = $$1(tplContent);
-          self.$imageWrap.after(this.$tplPosition);
-
-          this.$position = self.$expand.find(`.${self.namespace}-position`);
-          this.$items = this.$position.find('li');
-
-          $$1.each(this.values, (key, value) => {
-            that.$items.eq(key).data('position', value);
-          });
-
-          const value = typeof self.value.position !== 'undefined' ? self.value.position : this.defaultValue;
-          this.set(value);
-
-          this.bindEvent();
-        },
-
-        set(value) {
-          let found = false;
-          this.$items.removeClass(self.classes.active);
-          for (let i = 0; i < this.values.length; i++) {
-            if (value === this.values[i]) {
-              self.value.position = value;
-              this.$items.eq(i).addClass(self.classes.active);
-              self.$image.css({
-                'background-position': value
-              });
-              found = true;
-            }
-          }
-
-          if (!found) {
-            this.set(this.defaultValue);
-          }
-        },
-
-        clear() {
-          this.set(this.defaultValue);
-        },
-
-        bindEvent() {
-          const that = this;
-          this.$position.on('click', 'li', function() {
-            if (self.disabled) {
-              return;
-            }
-            const value = $$1(this).data('position');
-            that.set(value);
-            self._update();
-            return false;
-          });
-        }
-      },
-
-      doSize: {
-        values: self.options.size.values,
-        defaultValue: self.options.size.defaultValue,
-        init() {
-          const that = this;
-
-          const tplContent = self.options.size.tpl().replace(/\{\{namespace\}\}/g, self.namespace)
-            .replace(/\{\{strings.bgSize\}\}/g, self.strings.bgSize);
-          this.$tplSize = $$1(tplContent);
-          self.$imageWrap.after(this.$tplSize);
-
-          this.$size = self.$expand.find(`.${self.namespace}-size`);
-          this.$items = this.$size.find('li');
-
-          $$1.each(this.values, (key, value) => {
-            that.$items.eq(key).data('size', value);
-          });
-
-          const value = typeof self.value.size !== 'undefined' ? self.value.size : this.defaultValue;
-          this.set(value);
-
-          this.bindEvent();
-        },
-        set(value) {
-          let found = false;
-          this.$items.removeClass(self.classes.active);
-          for (let i = 0; i < this.values.length; i++) {
-            if (value === this.values[i]) {
-              self.value.size = value;
-              this.$items.eq(i).addClass(self.classes.active);
-              self.$image.css({
-                'background-size': value
-              });
-              found = true;
-            }
-          }
-          if (!found) {
-            this.set(this.defaultValue);
-          }
-        },
-
-        clear() {
-          this.set(this.defaultValue);
-        },
-
-        bindEvent() {
-          const that = this;
-          this.$size.on('click', 'li', function() {
-            if (self.disabled) {
-              return;
-            }
-            const value = $$1(this).data('size');
-            that.set(value);
-            self._update();
-            return false;
-          });
-        }
-      },
-      doAttachment: {
-        values: self.options.attachment.values,
-        defaultValue: self.options.attachment.defaultValue,
-        init() {
-          const that = this;
-          const tplContent = self.options.attachment.tpl().replace(/\{\{attachNamespace\}\}/g, self.options.attachment.namespace)
-            .replace(/\{\{namespace\}\}/g, self.namespace)
-            .replace(/\{\{strings.bgAttach\}\}/g, self.strings.bgAttach);
-          this.$tplAttachment = $$1(tplContent);
-          self.$imageWrap.after(this.$tplAttachment);
-
-          this.$attachment = self.$expand.find(`.${self.namespace}-attachment`);
-          this.$items = this.$attachment.find('li');
-          this.$dropdown = self.$expand.find(`.${self.options.attachment.namespace}`);
-          this.values = self.options.attachment.values;
-
-          $$1.each(this.values, (key, value) => {
-            that.$items.eq(key).data('attachment', value);
-          });
-
-          this.$dropdown.asDropdown({
-            namespace: self.options.attachment.namespace,
-            imitateSelect: true,
-            data: 'attachment',
-            // select: that.attachment,
-            onChange(value) {
-              if (self.disabled) {
-                return;
-              }
-              self.value.attachment = value;
-              self._update();
-              self.$image.css({
-                'background-attachment': self.value.attachment
-              });
-            }
-          });
-
-          const value = typeof self.value.attachment !== 'undefined' ? self.value.attachment : this.defaultValue;
-          this.set(value);
-        },
-
-        set(value) {
-          let found = false;
-          this.$items.removeClass(self.classes.active);
-          for (let i = 0; i < this.values.length; i++) {
-            if (value === this.values[i]) {
-              this.$dropdown.data('asDropdown').set(value);
-              found = true;
-            }
-          }
-
-          if (!found) {
-            this.set(this.defaultValue);
-          }
-        },
-
-        clear() {
-          this.set(this.defaultValue);
-        }
+  _bindEvent() {
+    const that = this;
+    this.$initiate.on('click', () => {
+      if (that.disabled) {
+        return;
       }
+
+      that.$wrap.addClass(that.classes.expand).removeClass(that.classes.exist);
     });
 
-    this._trigger('init');
-    this.init();
+    this.$info.on('mouseenter', function() {
+      if (that.disabled) {
+        return;
+      }
+
+      $$1(this).addClass(that.classes.hover);
+    }).on('mouseleave', function() {
+      if (that.disabled) {
+        return;
+      }
+
+      $$1(this).removeClass(that.classes.hover);
+    });
+
+    this.$change.on('click', () => {
+      if (that.disabled) {
+        return;
+      }
+
+      that.$wrap.addClass(that.classes.expand).removeClass(that.classes.exist);
+    });
+
+    this.$remove.on('click', () => {
+      if (that.disabled) {
+        return;
+      }
+
+      that.clear();
+
+      return false;
+    });
+
+    this.$close.on('click', () => {
+      if (that.disabled) {
+        return;
+      }
+
+      that.$wrap.addClass(that.classes.exist).removeClass(that.classes.expand);
+      return false;
+    });
+
+    this.$image.on('click', () => {
+      if (that.disabled) {
+        return;
+      }
+
+      that.options.select.call(that);
+    });
+  }
+
+  _createHtml() {
+    this.$wrap = $$1(this.options.tpl().replace(/\{\{namespace\}\}/g, this.namespace)
+      .replace(/\{\{strings.placeholder\}\}/g, this.strings.placeholder)
+      .replace(/\{\{strings.change\}\}/g, this.strings.change));
+    this.$element.after(this.$wrap);
+
+    this.$initiate = $$1(`.${this.namespace}-initiate`, this.$wrap);
+
+    this.$info = $$1(`.${this.namespace}-info`, this.$wrap);
+    this.$infoImageName = $$1(`.${this.namespace}-info-image-name`, this.$info);
+    this.$remove = $$1(`.${this.namespace}-info-remove`, this.$info);
+    this.$change = $$1(`.${this.namespace}-info-change`, this.$info);
+
+    this.$expand = $$1(`.${this.namespace}-expand`, this.$wrap);
+    this.$close = $$1(`.${this.namespace}-expand-close`, this.$expand);
+    this.$imageWrap = $$1(`.${this.namespace}-expand-image-wrap`, this.$expand);
+    this.$image = $$1(`.${this.namespace}-expand-image`, this.$expand);
+  }
+
+  _trigger(eventType,...params) {
+    const data = [this].concat(params);
+
+    // event
+    this.$element.trigger(`asBgPicker::${eventType}`, data);
+
+    // callback
+    eventType = eventType.replace(/\b\w+\b/g, word => word.substring(0, 1).toUpperCase() + word.substring(1));
+    const onFunction = `on${eventType}`;
+    if (typeof this.options[onFunction] === 'function') {
+      this.options[onFunction](...params);
+    }
+  }
+
+  _setState(image) {
+    if (!image || image === this.options.image) {
+      this.$wrap.addClass(this.classes.empty);
+    } else {
+      this.$wrap.removeClass(this.classes.empty);
+    }
+  }
+
+  _returnInfo(image) {
+    let imgName;
+    if (!image || image === this.options.image) {
+      this.$infoImageName.text(this.strings.placeholder);
+    } else {
+      imgName = image.match(/([\S]+[\/])([\S]+\w+$)/i)[2];
+      this.$infoImageName.text(imgName);
+    }
+  }
+
+  _update() {
+    if (this.value === null) {
+      this.value = {};
+    }
+
+    this.$element.val(this.val());
+    this._trigger('change', this.options.parse(this.val()), this.options.name, NAMESPACE$1);
   }
 
   val(value) {
@@ -597,24 +630,24 @@ class asBgPicker {
 
     if (update !== false) {
       if (typeof value.repeat !== 'undefined') {
-        this.doRepeat.set(value.repeat);
+        this.repeat.set(value.repeat);
       } else {
-        this.doRepeat.clear();
+        this.repeat.clear();
       }
       if (typeof value.size !== 'undefined') {
-        this.doSize.set(value.size);
+        this.size.set(value.size);
       } else {
-        this.doSize.clear();
+        this.size.clear();
       }
       if (typeof value.position !== 'undefined') {
-        this.doPosition.set(value.position);
+        this.position.set(value.position);
       } else {
-        this.doPosition.clear();
+        this.position.clear();
       }
       if (typeof value.attachment !== 'undefined') {
-        this.doAttachment.set(value.attachment);
+        this.attachment.set(value.attachment);
       } else {
-        this.doAttachment.clear();
+        this.attachment.clear();
       }
 
       this._update();
@@ -628,17 +661,17 @@ class asBgPicker {
       const image = '';
       this.setImage(image);
 
-      this.doRepeat.clear();
-      this.doSize.clear();
-      this.doPosition.clear();
-      this.doAttachment.clear();
+      this.repeat.clear();
+      this.size.clear();
+      this.position.clear();
+      this.attachment.clear();
       this._update();
     }
   }
 
   setImage(image) {
     let thumbnailUrl;
-    const self = this;
+    const that = this;
     this._setState(image);
     this._returnInfo(image);
     if (image === '' || typeof image === 'undefined') {
@@ -649,17 +682,17 @@ class asBgPicker {
       thumbnailUrl = this.options.getThumbnalil(image);
       const img = new Image();
       img.onload = () => {
-        self.value.image = thumbnailUrl;
-        self._returnInfo(self.value.image);
-        self.$image.css({
-          'background-image': `url('${self.value.image}')`
+        that.value.image = thumbnailUrl;
+        that._returnInfo(that.value.image);
+        that.$image.css({
+          'background-image': `url('${that.value.image}')`
         });
       };
       img.onerror = () => {
-        self.value.image = image;
-        self._returnInfo(image);
-        self._update();
-        self.$image.css({
+        that.value.image = image;
+        that._returnInfo(image);
+        that._update();
+        that.$image.css({
           'background-image': 'none'
         });
       };
@@ -668,19 +701,22 @@ class asBgPicker {
   }
 
   setRepeat(repeat) {
-    this.doRepeat.set(repeat);
+    this.repeat.set(repeat);
     this._update();
   }
+
   setSize(size) {
-    this.doSize.set(size);
+    this.size.set(size);
     this._update();
   }
+
   setPosition(position) {
-    this.doPosition.set(position);
+    this.position.set(position);
     this._update();
   }
+
   setAttachment(attachment) {
-    this.doAttachment.set(attachment);
+    this.attachment.set(attachment);
     this._update();
   }
 
@@ -692,67 +728,69 @@ class asBgPicker {
     this.disabled = false;
     this.$wrap.removeClass(this.classes.disabled);
   }
+
   disable() {
     this.disabled = true;
     this.$wrap.addClass(this.classes.disabled);
   }
+
   destory() {
-    this.$element.data(pluginName, null);
+    this.$element.data(NAMESPACE$1, null);
     this.$wrap.remove();
     this._trigger('destory');
   }
 
-static _jQueryInterface(options, ...params) {
-    'use strict';
-    if (typeof options === 'string') {
-      if (/^\_/.test(options)) {
-        return false;
-      } else if ((options === 'val' && params.length === 0)) {
-        let api = this.first().data(pluginName);
-        if (api && typeof api[options] === 'function') {
-          return api[options](...params);
-        }
-      } else {
-        return this.each(function() {
-          let api = $$1.data(this, pluginName);
-          if (api && typeof api[options] === 'function') {
-            api[options](...params);
-          }
-        });
-      }
-    }
-    return this.each(function() {
-      if (!$$1.data(this, pluginName)) {
-        $$1.data(this, pluginName, new asBgPicker(this, options));
-      }
-    });
-
+  static localize(lang, labels) {
+    STRINGS[lang] = labels;
   }
 
+  static setDefaults(options) {
+    $$1.extend(true, DEFAULTS, $$1.isPlainObject(options) && options);
+  }
 }
 
-asBgPicker.Strings = {};
-
-asBgPicker.localize = (lang, label) => {
-  'use strict';
-  asBgPicker.Strings[lang] = label;
+var info = {
+  version:'0.1.2'
 };
 
-asBgPicker.localize('en', {
-  placeholder: 'Add Image',
-  change: 'change',
-  bgRepeat: 'Repeat',
-  bgPosition: 'Position',
-  bgAttach: 'Attach',
-  bgSize: 'Scalling'
-});
+const NAMESPACE = 'asBgPicker';
+const OtherAsScrollbar = $$1.fn.asBgPicker;
 
-$$1.fn[pluginName] = asBgPicker._jQueryInterface;
-$$1.fn[pluginName].constructor = asBgPicker;
-$$1.fn[pluginName].noConflict = function() {
-  'use strict';
-  $$1.fn[pluginName] = JQUERY_NO_CONFLICT;
-  return asBgPicker._jQueryInterface;
+const jQueryasBgPicker = function(options, ...args) {
+  if (typeof options === 'string') {
+    const method = options;
+
+    if (/^_/.test(method)) {
+      return false;
+    } else if ((/^(get)/.test(method))) {
+      const instance = this.first().data(NAMESPACE);
+      if (instance && typeof instance[method] === 'function') {
+        return instance[method](...args);
+      }
+    } else {
+      return this.each(function() {
+        const instance = $$1.data(this, NAMESPACE);
+        if (instance && typeof instance[method] === 'function') {
+          instance[method](...args);
+        }
+      });
+    }
+  }
+
+  return this.each(function() {
+    if (!$$1(this).data(NAMESPACE)) {
+      $$1(this).data(NAMESPACE, new asBgPicker(this, options));
+    }
+  });
 };
 
-export default asBgPicker;
+$$1.fn.asBgPicker = jQueryasBgPicker;
+
+$$1.asBgPicker = $$1.extend({
+  setDefaults: asBgPicker.setDefaults,
+  localize: asBgPicker.localize,
+  noConflict: function() {
+    $$1.fn.asBgPicker = OtherAsScrollbar;
+    return jQueryasBgPicker;
+  }
+}, info);
