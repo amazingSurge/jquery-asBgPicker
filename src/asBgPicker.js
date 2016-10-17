@@ -160,17 +160,20 @@ class asBgPicker {
     this.$image = $(`.${this.namespace}-expand-image`, this.$expand);
   }
 
-  _trigger(eventType,...params) {
+  _trigger(eventType, ...params) {
     const data = [this].concat(params);
 
     // event
-    this.$element.trigger(`asBgPicker::${eventType}`, data);
+    this.$element.trigger(`${NAMESPACE}::${eventType}`, data);
 
     // callback
-    eventType = eventType.replace(/\b\w+\b/g, word => word.substring(0, 1).toUpperCase() + word.substring(1));
+    eventType = eventType.replace(/\b\w+\b/g, (word) => {
+      return word.substring(0, 1).toUpperCase() + word.substring(1);
+    });
     const onFunction = `on${eventType}`;
+
     if (typeof this.options[onFunction] === 'function') {
-      this.options[onFunction](...params);
+      this.options[onFunction].apply(this, params);
     }
   }
 
@@ -198,7 +201,7 @@ class asBgPicker {
     }
 
     this.$element.val(this.val());
-    this._trigger('change', this.options.parse(this.val()), this.options.name, NAMESPACE);
+    this._trigger('change', this.options.parse(this.val()));
   }
 
   val(value) {
@@ -326,10 +329,10 @@ class asBgPicker {
     this.$wrap.addClass(this.classes.disabled);
   }
 
-  destory() {
+  destroy() {
     this.$element.data(NAMESPACE, null);
     this.$wrap.remove();
-    this._trigger('destory');
+    this._trigger('destroy');
   }
 
   static localize(lang, labels) {

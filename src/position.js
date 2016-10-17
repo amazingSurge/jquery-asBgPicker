@@ -8,7 +8,6 @@ export default class Position {
   }
 
   init() {
-
     const tplContent = this.instance.options.position.tpl().replace(/\{\{namespace\}\}/g, this.instance.namespace)
       .replace(/\{\{strings.bgPosition\}\}/g, this.instance.strings.bgPosition);
     this.$tplPosition = $(tplContent);

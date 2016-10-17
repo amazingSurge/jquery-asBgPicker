@@ -1,5 +1,5 @@
 /**
-* jQuery asBgPicker v0.1.2
+* jQuery asBgPicker v0.1.3
 * https://github.com/amazingSurge/jquery-asBgPicker
 *
 * Copyright (c) amazingSurge
@@ -290,7 +290,6 @@ class Position {
   }
 
   init() {
-
     const tplContent = this.instance.options.position.tpl().replace(/\{\{namespace\}\}/g, this.instance.namespace)
       .replace(/\{\{strings.bgPosition\}\}/g, this.instance.strings.bgPosition);
     this.$tplPosition = $(tplContent);
@@ -568,17 +567,20 @@ class asBgPicker {
     this.$image = $$1(`.${this.namespace}-expand-image`, this.$expand);
   }
 
-  _trigger(eventType,...params) {
+  _trigger(eventType, ...params) {
     const data = [this].concat(params);
 
     // event
-    this.$element.trigger(`asBgPicker::${eventType}`, data);
+    this.$element.trigger(`${NAMESPACE$1}::${eventType}`, data);
 
     // callback
-    eventType = eventType.replace(/\b\w+\b/g, word => word.substring(0, 1).toUpperCase() + word.substring(1));
+    eventType = eventType.replace(/\b\w+\b/g, (word) => {
+      return word.substring(0, 1).toUpperCase() + word.substring(1);
+    });
     const onFunction = `on${eventType}`;
+
     if (typeof this.options[onFunction] === 'function') {
-      this.options[onFunction](...params);
+      this.options[onFunction].apply(this, params);
     }
   }
 
@@ -606,7 +608,7 @@ class asBgPicker {
     }
 
     this.$element.val(this.val());
-    this._trigger('change', this.options.parse(this.val()), this.options.name, NAMESPACE$1);
+    this._trigger('change', this.options.parse(this.val()));
   }
 
   val(value) {
@@ -734,10 +736,10 @@ class asBgPicker {
     this.$wrap.addClass(this.classes.disabled);
   }
 
-  destory() {
+  destroy() {
     this.$element.data(NAMESPACE$1, null);
     this.$wrap.remove();
-    this._trigger('destory');
+    this._trigger('destroy');
   }
 
   static localize(lang, labels) {
@@ -750,19 +752,19 @@ class asBgPicker {
 }
 
 var info = {
-  version:'0.1.2'
+  version:'0.1.3'
 };
 
 const NAMESPACE = 'asBgPicker';
-const OtherAsScrollbar = $$1.fn.asBgPicker;
+const OtherAsBgPicker = $$1.fn.asBgPicker;
 
-const jQueryasBgPicker = function(options, ...args) {
+const jQueryAsBgPicker = function(options, ...args) {
   if (typeof options === 'string') {
     const method = options;
 
     if (/^_/.test(method)) {
       return false;
-    } else if ((/^(get)/.test(method))) {
+    } else if ((/^(get)$/.test(method)) || (method === 'val' && args.length === 0)) {
       const instance = this.first().data(NAMESPACE);
       if (instance && typeof instance[method] === 'function') {
         return instance[method](...args);
@@ -784,13 +786,13 @@ const jQueryasBgPicker = function(options, ...args) {
   });
 };
 
-$$1.fn.asBgPicker = jQueryasBgPicker;
+$$1.fn.asBgPicker = jQueryAsBgPicker;
 
 $$1.asBgPicker = $$1.extend({
   setDefaults: asBgPicker.setDefaults,
   localize: asBgPicker.localize,
   noConflict: function() {
-    $$1.fn.asBgPicker = OtherAsScrollbar;
-    return jQueryasBgPicker;
+    $$1.fn.asBgPicker = OtherAsBgPicker;
+    return jQueryAsBgPicker;
   }
 }, info);

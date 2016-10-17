@@ -1,5 +1,5 @@
 /**
-* jQuery asBgPicker v0.1.2
+* jQuery asBgPicker v0.1.3
 * https://github.com/amazingSurge/jquery-asBgPicker
 *
 * Copyright (c) amazingSurge
@@ -711,7 +711,7 @@
           var data = [this].concat(params);
 
           // event
-          this.$element.trigger('asBgPicker::' + eventType, data);
+          this.$element.trigger(NAMESPACE$1 + '::' + eventType, data);
 
           // callback
           eventType = eventType.replace(/\b\w+\b/g,
@@ -723,9 +723,7 @@
           var onFunction = 'on' + eventType;
 
           if (typeof this.options[onFunction] === 'function') {
-            var _options;
-
-            (_options = this.options)[onFunction].apply(_options, params);
+            this.options[onFunction].apply(this, params);
           }
         }
       }, {
@@ -757,7 +755,7 @@
           }
 
           this.$element.val(this.val());
-          this._trigger('change', this.options.parse(this.val()), this.options.name, NAMESPACE$1);
+          this._trigger('change', this.options.parse(this.val()));
         }
       }, {
         key: 'val',
@@ -904,11 +902,11 @@
           this.$wrap.addClass(this.classes.disabled);
         }
       }, {
-        key: 'destory',
-        value: function destory() {
+        key: 'destroy',
+        value: function destroy() {
           this.$element.data(NAMESPACE$1, null);
           this.$wrap.remove();
-          this._trigger('destory');
+          this._trigger('destroy');
         }
       }], [{
         key: 'localize',
@@ -926,13 +924,13 @@
     }();
 
     var info = {
-      version: '0.1.2'
+      version: '0.1.3'
     };
 
     var NAMESPACE = 'asBgPicker';
-    var OtherAsScrollbar = _jquery2.default.fn.asBgPicker;
+    var OtherAsBgPicker = _jquery2.default.fn.asBgPicker;
 
-    var jQueryasBgPicker = function jQueryasBgPicker(options) {
+    var jQueryAsBgPicker = function jQueryAsBgPicker(options) {
       var _this5 = this;
 
       for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
@@ -948,7 +946,7 @@
             return {
               v: false
             };
-          } else if (/^(get)/.test(method)) {
+          } else if (/^(get)$/.test(method) || method === 'val' && args.length === 0) {
             var instance = _this5.first().data(NAMESPACE);
 
             if (instance && typeof instance[method] === 'function') {
@@ -989,15 +987,15 @@
       );
     };
 
-    _jquery2.default.fn.asBgPicker = jQueryasBgPicker;
+    _jquery2.default.fn.asBgPicker = jQueryAsBgPicker;
 
     _jquery2.default.asBgPicker = _jquery2.default.extend({
       setDefaults: asBgPicker.setDefaults,
       localize: asBgPicker.localize,
       noConflict: function noConflict() {
-        _jquery2.default.fn.asBgPicker = OtherAsScrollbar;
+        _jquery2.default.fn.asBgPicker = OtherAsBgPicker;
 
-        return jQueryasBgPicker;
+        return jQueryAsBgPicker;
       }
     }, info);
   }

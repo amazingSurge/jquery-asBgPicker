@@ -2,7 +2,7 @@
   "name": "jquery-asBgPicker",
   "title": "jQuery asBgPicker",
   "description": "A jquery plugin that do amazing things.",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "homepage": "https://github.com/amazingSurge/jquery-asBgPicker",
   "author": {
     "name": "amazingSurge",
@@ -120,6 +120,7 @@
     "npm": ">= 3"
   },
   "dependencies": {
-    "jquery": ">=2.2.0"
+    "jquery": ">=2.2.0",
+    "jquery-asDropdown": "^0.2.1"
   }
 }

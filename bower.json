@@ -1,6 +1,6 @@
 {
   "name": "jquery-asBgPicker",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A jquery plugin that do amazing things.",
   "main": "dist/jquery-asBgPicker.js",
   "copyright": "amazingSurge",

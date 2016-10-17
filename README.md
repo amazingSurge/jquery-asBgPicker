@@ -46,6 +46,11 @@ bower install jquery-asBgPicker --save
 npm install jquery-asBgPicker --save
 ```
 
+#### Install From Yarn
+```sh
+yarn add jquery-asBgPicker
+```
+
 #### Build From Source
 If you want build from source:
 
@@ -107,11 +112,11 @@ You can also save the instances to variable for further use.
 
 ```javascript
 // call directly
-$().asBgPicker('destory');
+$().asBgPicker('destroy');
 
 // or
 var api = $().data('asBgPicker');
-api.destory();
+api.destroy();
 ```
 
 #### enable()

@@ -3,15 +3,15 @@ import asBgPicker from './asBgPicker';
 import info from './info';
 
 const NAMESPACE = 'asBgPicker';
-const OtherAsScrollbar = $.fn.asBgPicker;
+const OtherAsBgPicker = $.fn.asBgPicker;
 
-const jQueryasBgPicker = function(options, ...args) {
+const jQueryAsBgPicker = function(options, ...args) {
   if (typeof options === 'string') {
     const method = options;
 
     if (/^_/.test(method)) {
       return false;
-    } else if ((/^(get)/.test(method))) {
+    } else if ((/^(get)$/.test(method)) || (method === 'val' && args.length === 0)) {
       const instance = this.first().data(NAMESPACE);
       if (instance && typeof instance[method] === 'function') {
         return instance[method](...args);
@@ -33,13 +33,13 @@ const jQueryasBgPicker = function(options, ...args) {
   });
 };
 
-$.fn.asBgPicker = jQueryasBgPicker;
+$.fn.asBgPicker = jQueryAsBgPicker;
 
 $.asBgPicker = $.extend({
   setDefaults: asBgPicker.setDefaults,
   localize: asBgPicker.localize,
   noConflict: function() {
-    $.fn.asBgPicker = OtherAsScrollbar;
-    return jQueryasBgPicker;
+    $.fn.asBgPicker = OtherAsBgPicker;
+    return jQueryAsBgPicker;
   }
 }, info);
