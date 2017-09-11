@@ -1,5 +1,5 @@
 /**
-* jQuery asBgPicker v0.1.3
+* jQuery asBgPicker v0.1.4
 * https://github.com/amazingSurge/jquery-asBgPicker
 *
 * Copyright (c) amazingSurge
@@ -752,7 +752,7 @@ class asBgPicker {
 }
 
 var info = {
-  version:'0.1.3'
+  version:'0.1.4'
 };
 
 const NAMESPACE = 'asBgPicker';
